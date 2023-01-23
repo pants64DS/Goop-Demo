@@ -11,3 +11,8 @@ The goal of this project is to create a demo application that simulates and rend
 The edges of the areas covered by paint, as well as the outlines of each new paint droplet are modeled using quadratic Bézier splines. When a new droplet intersects with existing paint on the canvas, the intersection points of the two splines are calculated, both splines are merged into one and the redundant parts of the new spline are removed. Since the painted area can have all kinds of weird concave shapes, and it might even holes in it, this is the part where the problem becomes algorithmically interesting. Unfortunately, I couldn't find any existing algorithms for this purpose, but I do have a pretty solid idea of my own.
 
 The edges of the painted area can be rendered as triangles with a quadratic Bézier curve -shaped texture on them. The area inside the edges can be triangulated using an existing algorithm, but there's many options and I haven't decided which one I'll choose yet.
+
+### Course Details
+Programme: TKT</br>
+Project language: English</br>
+Programming languages: This project will use Python, but I can also peer review projects that use C, C++, C# or Java, in both English and Finnish.</br>
