@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "goop-demo"
+version = "0.1.0"
+description = ""
+authors = ["pants64DS <pants64DS@users.noreply.github.com>"]
+readme = "README.md"
+packages = [{include = "goop_demo"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+sfml = "^2.3.2.dev1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,3 +1,5 @@
+# Requirement Specification
+
 ## Motivation
 
 In some video games, paint or other opaque liquid is used as a game mechanic, allowing the player or enemies to cower areas on different surfaces. The best example of this might be the *Splatoon*-series, but it has been used in at least *Super Mario Sunshine* as well.
