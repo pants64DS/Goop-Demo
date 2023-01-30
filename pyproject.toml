@@ -8,7 +8,7 @@ packages = [{include = "goop_demo"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-sfml = "^2.3.2.dev1"
+raylib = "^4.2.1.2"
 
 
 [build-system]
