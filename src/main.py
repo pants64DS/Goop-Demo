@@ -1,5 +1,4 @@
 import pyray
-from util.vector2 import Vector2
 from ui.button import Button
 from ui.window import *
 from geometry.curve import Curve
@@ -28,11 +27,16 @@ while not pyray.window_should_close():
 	curve1 = Curve(buttons[0].pos, buttons[1].pos, buttons[2].pos)
 	curve2 = Curve(buttons[3].pos, buttons[4].pos, buttons[5].pos)
 
+	intersections = curve1.find_intersections(curve2)
+
 	pyray.begin_drawing()
 	pyray.clear_background(bg_color)
 
 	curve1.draw(main_color)
 	curve2.draw(main_color)
+
+	for intersection in intersections:
+		pyray.draw_circle_lines(int(intersection.x), int(intersection.y), 10, pyray.RED)
 
 	for button in buttons:
 		button.draw()
