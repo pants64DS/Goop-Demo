@@ -47,8 +47,8 @@ inflection = "*"
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.10"
-content-hash = "da86870331c27ee4d54d82585766b9bdab21a1069eb5bad75e7be96c60431e81"
+python-versions = "^3.8"
+content-hash = "9f4a4d75f6edb5f197c3468dd957c2b20c734365932b00fd63b1903234af9878"
 
 [metadata.files]
 cffi = [
