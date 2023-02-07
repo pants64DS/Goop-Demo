@@ -4,8 +4,11 @@ This project will be a demo application that simulates a game mechanic involving
 
 ## Documentation
 * [Requirement Specification](doc/Requirement%20Specification.md)
+* [Implementation Document](doc/Implementation.md)
+* [Testing Document](doc/Testing.md)
 * [Weekly Report \#1](doc/Weekly%20Report%201.md)
 * [Weekly Report \#2](doc/Weekly%20Report%202.md)
+* [Weekly Report \#3](doc/Weekly%20Report%203.md)
 
 ## Installation
 1. Make sure Poetry and Python 3.8 or later are installed
