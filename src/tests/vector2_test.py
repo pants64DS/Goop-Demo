@@ -1,6 +1,6 @@
 import unittest
-from util.vector2 import IntVec2
 from math import sqrt
+from util.vector2 import IntVec2
 
 class TestIntVec2(unittest.TestCase):
 	def setUp(self):

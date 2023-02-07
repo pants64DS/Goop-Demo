@@ -7,14 +7,14 @@ class Button:
 		self.pos = IntVec2(x, y)
 		self.color = color
 		self.radius = radius
-		self.clickOffset = IntVec2(0, 0)
+		self.click_offset = IntVec2(0, 0)
 		self.clicked = False
 
 	def click(self, clicked_pos):
 		offset = self.pos - IntVec2(clicked_pos.x, clicked_pos.y)
 
 		if offset.length() <= self.radius:
-			self.clickOffset = offset
+			self.click_offset = offset
 			self.clicked = True
 			return True
 		return False
@@ -23,7 +23,7 @@ class Button:
 		if not self.clicked:
 			return
 
-		self.pos = IntVec2(mouse_pos.x, mouse_pos.y) + self.clickOffset
+		self.pos = IntVec2(mouse_pos.x, mouse_pos.y) + self.click_offset
 
 		if self.pos.x < self.radius: self.pos.x = self.radius
 		if self.pos.y < self.radius: self.pos.y = self.radius
