@@ -1,11 +1,12 @@
 import numpy
 import pyray
+from util.vector2 import IntVec2
 
 class Curve:
 	def __init__(self, p0, p1, p2):
-		self.p0 = p0
-		self.p1 = p1
-		self.p2 = p2
+		self.p0 = IntVec2(p0)
+		self.p1 = IntVec2(p1)
+		self.p2 = IntVec2(p2)
 
 	def get_coeff_vectors(self):
 		return self.p0, 2 * (self.p1 - self.p0), self.p0 + self.p2 - 2 * self.p1
