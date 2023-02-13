@@ -26,18 +26,24 @@ class LoopView:
 		self.buttons.update()
 
 		self.loop = Loop([button.pos for button in self.buttons])
-		mouse_pos = IntVec2.from_pyray_vector2(pyray.get_mouse_position())
+		self.mouse_pos = IntVec2.from_pyray_vector2(pyray.get_mouse_position())
 
 		try:
-			if self.loop.is_point_inside(mouse_pos):
+			if self.loop.is_point_inside(self.mouse_pos):
 				self.message = "Inside"
+				self.message_color = pyray.YELLOW
 			else:
 				self.message = "Outside"
+				self.message_color = pyray.RED
+
 		except NotImplementedError:
 			self.message = "Scenario unimplemented"
+			self.message_color = pyray.RED
 
 	def draw(self):
 		self.loop.draw(main_color)
 		self.buttons.draw()
 
-		pyray.draw_text(self.message, 20, 20, 30, pyray.RED)
+		text_x = self.mouse_pos.x + 10
+		text_y = self.mouse_pos.y - 30
+		pyray.draw_text(self.message, text_x, text_y, 20, self.message_color)
