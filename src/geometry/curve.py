@@ -1,6 +1,35 @@
+from math import sqrt
 import numpy
 import pyray
 from util.vector2 import IntVec2
+
+# Returns true when (-b - sqrt(bb - 4ac)) / (2a) >= 0
+def is_first_root_nonnegative(a, b, c):
+	if a > 0:
+		return b <= 0 <= c
+	else:
+		return b >= 0 or c >= 0
+
+# Returns true when (-b + sqrt(bb - 4ac)) / (2a) >= 0
+def is_second_root_nonnegative(a, b, c):
+	if a > 0:
+		return b <= 0 or c <= 0
+	else:
+		return c <= 0 <= b
+
+# Returns true when (-b - sqrt(bb - 4ac)) / (2a) < 1
+def is_first_root_below_one(a, b, c):
+	if a > 0:
+		return a + b < -c or b > -2 * a
+	else:
+		return a + b < -c and b <= -2 * a
+
+# Returns true when (-b + sqrt(bb - 4ac)) / (2a) < 1
+def is_second_root_below_one(a, b, c):
+	if a > 0:
+		return a + b > -c and b >= -2 * a
+	else:
+		return a + b > -c or b < -2 * a
 
 class Curve:
 	def __init__(self, p0, p1, p2):
@@ -22,6 +51,36 @@ class Curve:
 
 		return coeffs[0] + (coeffs[1] + coeffs[2] * t) * t
 
+	def eval_x(self, t):
+		coeffs = self.get_x_coeffs()
+
+		return coeffs[0] + (coeffs[1] + coeffs[2] * t) * t
+
+	def eval_y(self, t):
+		coeffs = self.get_y_coeffs()
+
+		return coeffs[0] + (coeffs[1] + coeffs[2] * t) * t
+
+	def parity_of_vertical_line_intersections(self, line_x):
+		# The edge cases here are the most complicated
+		if line_x == self.p0.x:
+			if self.p0.x == self.p2.x:
+				return 1
+			elif self.p0.x < self.p2.x:
+				return int(self.p1.x >= line_x)
+			else:
+				return int(self.p1.x <= line_x)
+
+		if line_x == self.p2.x:
+			if self.p0.x < self.p2.x:
+				return int(self.p1.x > line_x)
+			else:
+				return int(self.p1.x < line_x)
+
+		lo, hi = sorted((self.p0.x, self.p2.x))
+
+		return int(lo < line_x < hi)
+
 	def draw(self, color, thickness=2):
 		pyray.draw_line_bezier_quad(
 			self.p0.to_pyray_vector2(),
@@ -29,6 +88,38 @@ class Curve:
 			self.p1.to_pyray_vector2(),
 			thickness, color
 		)
+
+	def draw_lines(self, color):
+		pyray.draw_line(self.p0.x, self.p0.y, self.p1.x, self.p1.y, color)
+		pyray.draw_line(self.p1.x, self.p1.y, self.p2.x, self.p2.y, color)
+
+	def find_vertical_line_intersections(self, line_x):
+		a = self.p0.x + self.p2.x - 2 * self.p1.x
+		b = 2*(self.p1.x - self.p0.x)
+		c = self.p0.x - line_x
+
+		if a == 0:
+			if b*c <= 0 and -b*c < b*b:
+				return [self.eval_y(-c / b)]
+			else:
+				return []
+
+		discriminant = b*b - 4*a*c
+
+		if discriminant <= 0:
+			return []
+
+		results = []
+
+		if is_first_root_nonnegative(a, b, c) and is_first_root_below_one(a, b, c):
+			root = (-b - sqrt(b*b - 4*a*c)) / (2*a)
+			results.append(self.eval_y(root))
+
+		if is_second_root_nonnegative(a, b, c) and is_second_root_below_one(a, b, c):
+			root = (-b + sqrt(b*b - 4*a*c)) / (2*a)
+			results.append(self.eval_y(root))
+
+		return results
 
 	def find_intersections(self, other):
 		# Construct a matrix for a linear map that makes the parabolas perpendicular

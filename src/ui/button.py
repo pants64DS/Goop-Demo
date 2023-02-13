@@ -42,3 +42,30 @@ class Button:
 			pyray.draw_circle(int(self.pos.x), int(self.pos.y), self.radius, self.color)
 		else:
 			pyray.draw_circle_lines(int(self.pos.x), int(self.pos.y), self.radius, self.color)
+
+class ButtonSystem:
+	def __init__(self, *buttons):
+		self.buttons = buttons
+
+	def update(self):
+		if pyray.is_mouse_button_pressed(0):
+			mouse_pos = pyray.get_mouse_position()
+			for button in self.buttons:
+				if button.click(mouse_pos):
+					break
+
+		if pyray.is_mouse_button_released(0):
+			for button in self.buttons:
+				button.unclick()
+
+		if pyray.is_mouse_button_down(0):
+			mouse_pos = pyray.get_mouse_position()
+			for button in self.buttons:
+				button.update_pos(mouse_pos)
+
+	def draw(self):
+		for button in self.buttons:
+			button.draw()
+
+	def __getitem__(self, key):
+		return self.buttons.__getitem__(key)

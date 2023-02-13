@@ -38,6 +38,9 @@ class IntVec2:
 	def __rmul__(self, scalar):
 		return IntVec2(self.x * scalar, self.y * scalar)
 
+	def __floordiv__(self, scalar):
+		return IntVec2(self.x // scalar, self.y // scalar)
+
 	def __neg__(self):
 		return IntVec2(-self.x, -self.y)
 
@@ -58,3 +61,7 @@ class IntVec2:
 
 	def to_pyray_vector2(self):
 		return pyray.Vector2(self.x, self.y)
+
+	@classmethod
+	def from_pyray_vector2(cls, vector2):
+		return cls(vector2.x, vector2.y)
