@@ -50,9 +50,9 @@ class Loop:
 					parity += 1
 
 			if line_x == curve.p2.x and line_start_y > curve.p2.y:
-				from_the_left = (curve.p1.x if curve.p1.x else curve.p0.x) < line_x
+				from_the_right = (curve.p1.x if curve.p1.x else curve.p0.x) > line_x
 
-				if not from_the_left:
+				if from_the_right:
 					parity += 1
 
 		return bool(parity & 1)
