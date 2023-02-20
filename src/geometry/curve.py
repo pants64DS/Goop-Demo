@@ -38,13 +38,19 @@ class Curve:
 		self.p2 = IntVec2(p2)
 
 	def get_coeff_vectors(self):
-		return self.p0, 2 * (self.p1 - self.p0), self.p0 + self.p2 - 2 * self.p1
+		return self.p0, \
+			2 * (self.p1 - self.p0), \
+			self.p0 + self.p2 - 2 * self.p1
 
 	def get_x_coeffs(self):
-		return self.p0.x, 2 * (self.p1.x - self.p0.x), self.p0.x + self.p2.x - 2 * self.p1.x
+		return self.p0.x, \
+			2 * (self.p1.x - self.p0.x), \
+			self.p0.x + self.p2.x - 2 * self.p1.x
 
 	def get_y_coeffs(self):
-		return self.p0.y, 2 * (self.p1.y - self.p0.y), self.p0.y + self.p2.y - 2 * self.p1.y
+		return self.p0.y, \
+			2 * (self.p1.y - self.p0.y), \
+			self.p0.y + self.p2.y - 2 * self.p1.y
 
 	def eval(self, t):
 		coeffs = self.get_coeff_vectors()
@@ -60,6 +66,11 @@ class Curve:
 		coeffs = self.get_y_coeffs()
 
 		return coeffs[0] + (coeffs[1] + coeffs[2] * t) * t
+
+	def derivative(self, t):
+		coeffs = self.get_coeff_vectors()
+
+		return coeffs[1] + 2 * coeffs[2] * t
 
 	def parity_of_vertical_line_intersections(self, line_x):
 		# The edge cases here are the most complicated
@@ -128,6 +139,10 @@ class Curve:
 		m3 =  -self.p0.x -  self.p2.x + 2 *  self.p1.x
 		m4 =  other.p0.x + other.p2.x - 2 * other.p1.x
 
+		det = m1 * m4 - m3 * m3
+		if det == 0:
+			raise NotImplementedError("Parabolas with parallel axes")
+
 		# Apply the linear map to the control points
 		p0x = self.p0.x * m1 + self.p0.y * m3
 		p0y = self.p0.x * m2 + self.p0.y * m4
@@ -164,11 +179,63 @@ class Curve:
 
 		# Solve for the intersections and discard any of them that lie outside of either curve
 		results = []
+		lo, hi = sorted((q0y, q2y))
+
 		for root in f.roots():
-			t = numpy.real(root)
-			if abs(numpy.imag(root)) < 1e-5 and 0 <= t <= 1:
-				lo, hi = sorted((q0y, q2y))
-				if lo <= (a1*t + b1) * t + p0y <= hi:
-					results.append(self.eval(t))
+			t1 = numpy.real(root)
+			if abs(numpy.imag(root)) < 1e-5 and 0 <= t1 < 1:
+				t2 = (a1*t1 + b1) * t1 + p0y
+				if lo <= t2 < hi:
+					results.append(CurveIntersection(self, other, t1, (t2 - q0y) / (q2y - q0y)))
 
 		return results
+
+	def clip_until(self, t):
+		p0 = self.eval(t)
+		p1 = line_intersection(Line(p0, self.derivative(t)), Line(self.p2, self.p1 - self.p2))
+
+		return Curve(p0, p1, self.p2)
+
+	def clip_after(self, t):
+		p2 = self.eval(t)
+		p1 = line_intersection(Line(p2, self.derivative(t)), Line(self.p0, self.p1 - self.p0))
+
+		return Curve(self.p0, p1, p2)
+
+	def clip_after_until(self, t1, t2):
+		p0 = self.eval(t1)
+		p2 = self.eval(t2)
+		p1 = line_intersection(Line(p0, self.derivative(t1)), Line(p2, self.derivative(t2)))
+
+		return Curve(p0, p1, p2)
+
+class Line:
+	def __init__(self, pos, dir):
+		self.pos = pos
+		self.dir = dir
+
+def line_intersection(l1, l2):
+	t = (l2.dir.x * (l1.pos.y - l2.pos.y) + l2.dir.y * (l2.pos.x - l1.pos.x)) / (l1.dir.x * l2.dir.y - l2.dir.x * l1.dir.y)
+
+	return l1.pos + l1.dir * t
+
+
+class CurveIntersection:
+	def __init__(self, curve1, curve2, t1, t2):
+		self.curve1 = curve1
+		self.curve2 = curve2
+		self.t1 = t1
+		self.t2 = t2
+
+	def get_pos(self):
+		# return self.curve1.eval(self.t1)
+		return self.curve2.eval(self.t2)
+
+	def get_pos_x(self):
+		# return self.curve1.eval_x(self.t1)
+		return self.curve2.eval_x(self.t2)
+
+	def get_pos_y(self):
+		# return self.curve1.eval_y(self.t1)
+		return self.curve2.eval_y(self.t2)
+

@@ -23,11 +23,11 @@ class CurveView:
 
 		self.mouse_pos = IntVec2.from_pyray_vector2(pyray.get_mouse_position())
 
-		y_coords1 = self.curve1.find_vertical_line_intersections(self.mouse_pos.x)
-		y_coords2 = self.curve2.find_vertical_line_intersections(self.mouse_pos.x)
+		# y_coords1 = self.curve1.find_vertical_line_intersections(self.mouse_pos.x)
+		# y_coords2 = self.curve2.find_vertical_line_intersections(self.mouse_pos.x)
 
-		self.intersections += [IntVec2(self.mouse_pos.x, y) for y in y_coords1]
-		self.intersections += [IntVec2(self.mouse_pos.x, y) for y in y_coords2]
+		# self.intersections += [IntVec2(self.mouse_pos.x, y) for y in y_coords1]
+		# self.intersections += [IntVec2(self.mouse_pos.x, y) for y in y_coords2]
 
 	def draw(self):
 		self.curve1.draw(main_color)
@@ -36,9 +36,10 @@ class CurveView:
 		self.curve1.draw_lines(pyray.RED)
 		self.curve2.draw_lines(pyray.RED)
 
-		pyray.draw_line(self.mouse_pos.x, 0, self.mouse_pos.x, screen_height, main_color)
+		# pyray.draw_line(self.mouse_pos.x, 0, self.mouse_pos.x, screen_height, main_color)
 
 		self.buttons.draw()
 
 		for intersection in self.intersections:
-			pyray.draw_circle_lines(int(intersection.x), int(intersection.y), 10, pyray.RED)
+			x, y = intersection.get_pos()
+			pyray.draw_circle_lines(x, y, 10, pyray.RED)

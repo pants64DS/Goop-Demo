@@ -1,4 +1,5 @@
 import pyray
+from math import atan2
 
 class IntVec2:
 	def __init__(self, *args):
@@ -65,3 +66,6 @@ class IntVec2:
 	@classmethod
 	def from_pyray_vector2(cls, vector2):
 		return cls(vector2.x, vector2.y)
+
+def get_angle_between(u, v):
+	return atan2(u.x*v.y - v.x*u.y, u.x*v.x + u.y*v.y)
