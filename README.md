@@ -10,6 +10,7 @@ This project will be a demo application that simulates a game mechanic involving
 * [Weekly Report \#2](doc/Weekly%20Report%202.md)
 * [Weekly Report \#3](doc/Weekly%20Report%203.md)
 * [Weekly Report \#4](doc/Weekly%20Report%204.md)
+* [Weekly Report \#5](doc/Weekly%20Report%205.md)
 
 ## Installation
 1. Make sure Poetry and Python 3.8 or later are installed
@@ -17,4 +18,4 @@ This project will be a demo application that simulates a game mechanic involving
 3. If that worked as expected, you can now start the application by running the command `poetry run python src/main.py`
 
 ## How to use
-The demo application currently has two different views, which can be entered by pressing 1 or 2. In both of them, the control points of the Bézier curves can be moved by dragging them with the mouse.
+The demo application currently has three different views, which can be entered by pressing 1, 2 or 3. In the first two, the control points of the Bézier curves can be moved by dragging them with the mouse. See [Weekly Report \#5](doc/Weekly%20Report%205.md) for details about the third one.
