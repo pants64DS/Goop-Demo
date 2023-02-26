@@ -1,15 +1,12 @@
 import pyray
-from ui.window import *
-from ui.curve_view import CurveView
-from ui.loop_view import LoopView
-from ui.cell_view import CellView
+import ui
 
 if __name__ == "__main__":
-	pyray.init_window(screen_width, screen_height, "Goop Demo")
+	pyray.init_window(ui.screen_width, ui.screen_height, "Goop Demo")
 	pyray.enable_event_waiting()
 
-	curve_view = CurveView()
-	loop_view = LoopView()
+	curve_view = ui.CurveView()
+	loop_view = ui.LoopView()
 
 	curr_view = loop_view
 	while not pyray.window_should_close():
@@ -20,11 +17,11 @@ if __name__ == "__main__":
 			curr_view = loop_view
 
 		if pyray.is_key_pressed(pyray.KEY_THREE) and curr_view is loop_view:
-			curr_view = CellView(loop_view.loop)
+			curr_view = ui.CellView(loop_view.loop)
 
 		curr_view.update()
 		pyray.begin_drawing()
-		pyray.clear_background(bg_color)
+		pyray.clear_background(ui.bg_color)
 		curr_view.draw()
 		pyray.end_drawing()
 

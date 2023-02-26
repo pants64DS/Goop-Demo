@@ -1,9 +1,8 @@
 from math import sin, cos, pi, degrees
 import pyray
-from ui.window import *
-from util.vector2 import IntVec2
-from geometry.loop import Loop, test_intersections
-from geometry.loop_system import Cell, LoopSystem
+import ui
+from util import IntVec2
+from geometry import Loop, Cell, LoopSystem
 
 class CellView:
 	def __init__(self, loop):
@@ -38,8 +37,8 @@ class CellView:
 		a = ("123434"
 			"6789")
 		assert(a == "1234346789")
-		self.loop_system.draw(main_color)
-		self.new_loop.draw(main_color)
+		self.loop_system.draw(ui.main_color)
+		self.new_loop.draw(ui.main_color)
 
 		if self.message:
 			pyray.draw_text(self.message, 50, 50, 30, pyray.RED)

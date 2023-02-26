@@ -1,9 +1,9 @@
 import pyray
-from util.vector2 import IntVec2
-from ui.window import *
+from util import IntVec2
+import ui
 
 class Button:
-	def __init__(self, x, y, color = main_color, radius = 10):
+	def __init__(self, x, y, color = ui.main_color, radius = 10):
 		self.pos = IntVec2(x, y)
 		self.color = color
 		self.radius = radius
@@ -28,8 +28,8 @@ class Button:
 		if self.pos.x < self.radius: self.pos.x = self.radius
 		if self.pos.y < self.radius: self.pos.y = self.radius
 
-		max_x = screen_width - self.radius
-		max_y = screen_height - self.radius
+		max_x = ui.screen_width - self.radius
+		max_y = ui.screen_height - self.radius
 
 		if self.pos.x > max_x: self.pos.x = max_x
 		if self.pos.y > max_y: self.pos.y = max_y

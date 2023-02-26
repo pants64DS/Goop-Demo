@@ -1,10 +1,10 @@
 import unittest
-from geometry.curve import Curve
-from util.vector2 import IntVec2
+from geometry import ParabolicCurve
+from util import IntVec2
 
-class TestCurve(unittest.TestCase):
+class TestParabolicCurve(unittest.TestCase):
 	def setUp(self):
-		self.curve = Curve((11, 12), (13, 14), (15, 16))
+		self.curve = ParabolicCurve((11, 12), (13, 14), (15, 16))
 
 	def test_get_coeff_vectors(self):
 		c, b, a = self.curve.get_coeff_vectors()
@@ -25,8 +25,8 @@ class TestCurve(unittest.TestCase):
 		self.assertEqual(c, 12)
 
 	def test_one_intersection(self):
-		curve1 = Curve((2000, 7000), (4000, 3000), (6000, 7000))
-		curve2 = Curve((7000, 2000), (1000, 5000), (7000, 8000))
+		curve1 = ParabolicCurve((2000, 7000), (4000, 3000), (6000, 7000))
+		curve2 = ParabolicCurve((7000, 2000), (1000, 5000), (7000, 8000))
 		tolerance = 1
 
 		intersections = curve1.find_intersections(curve2)
@@ -42,8 +42,8 @@ class TestCurve(unittest.TestCase):
 		self.assertLessEqual(points[0].dist(IntVec2(4000, 5000)), tolerance)
 
 	def test_two_intersections(self):
-		curve1 = Curve((2000, 5000), (5000, 10000), (8000, 5000))
-		curve2 = Curve((3000, 8000), (3000,  4000), (9000, 7000))
+		curve1 = ParabolicCurve((2000, 5000), (5000, 10000), (8000, 5000))
+		curve2 = ParabolicCurve((3000, 8000), (3000,  4000), (9000, 7000))
 		tolerance = 1
 
 		intersections = curve1.find_intersections(curve2)
@@ -61,8 +61,8 @@ class TestCurve(unittest.TestCase):
 		self.assertLessEqual(points[1].dist(IntVec2(7168, 6195)), tolerance)
 
 	def test_three_intersections(self):
-		curve1 = Curve((9000,  11000), (6000, 11000), (9000, 6000))
-		curve2 = Curve((10000, 12000), (5000,  9000), (9000, 7000))
+		curve1 = ParabolicCurve((9000,  11000), (6000, 11000), (9000, 6000))
+		curve2 = ParabolicCurve((10000, 12000), (5000,  9000), (9000, 7000))
 		tolerance = 1
 
 		intersections = curve1.find_intersections(curve2)
@@ -82,8 +82,8 @@ class TestCurve(unittest.TestCase):
 		self.assertLessEqual(points[2].dist(IntVec2(8498, 10957)), tolerance)
 
 	def test_four_intersections(self):
-		curve1 = Curve((1000, 5000), (15000, 3000), (1000, 1000))
-		curve2 = Curve((7000, 1000), (5000, 10000), (3000,    0))
+		curve1 = ParabolicCurve((1000, 5000), (15000, 3000), (1000, 1000))
+		curve2 = ParabolicCurve((7000, 1000), (5000, 10000), (3000,    0))
 		tolerance = 1.5
 
 		intersections = curve1.find_intersections(curve2)

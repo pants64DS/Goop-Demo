@@ -1,7 +1,8 @@
 from math import sqrt
 import numpy
 import pyray
-from util.vector2 import IntVec2
+from geometry import LinearCurve, find_line_intersection, BoundingBox, CurveIntersection
+from util import IntVec2
 
 # Returns true when (-b - sqrt(bb - 4ac)) / (2a) >= 0
 def is_first_root_nonnegative(a, b, c):
@@ -31,7 +32,7 @@ def is_second_root_below_one(a, b, c):
 	else:
 		return a + b > -c or b < -2 * a
 
-class Curve:
+class ParabolicCurve:
 	def __init__(self, p0, p1, p2):
 		self.p0 = IntVec2(p0)
 		self.p1 = IntVec2(p1)
@@ -75,12 +76,12 @@ class Curve:
 	def parity_of_vertical_line_intersections(self, line_x):
 		# The edge cases here are the most complicated
 		if line_x == self.p0.x:
-			if self.p0.x == self.p2.x:
-				return 1
-			elif self.p0.x < self.p2.x:
+			if self.p0.x < self.p2.x:
 				return int(self.p1.x >= line_x)
-			else:
+			elif self.p2.x < self.p0.x:
 				return int(self.p1.x <= line_x)
+			else:
+				return 0
 
 		if line_x == self.p2.x:
 			if self.p0.x < self.p2.x:
@@ -91,6 +92,9 @@ class Curve:
 		lo, hi = sorted((self.p0.x, self.p2.x))
 
 		return int(lo < line_x < hi)
+
+	def get_bounding_box(self):
+		return BoundingBox(self.p0, self.p1, self.p2)
 
 	def draw(self, color, thickness=2):
 		pyray.draw_line_bezier_quad(
@@ -132,14 +136,32 @@ class Curve:
 
 		return results
 
+	def starts_going_left(self):
+		if self.p1.x == self.p0.x:
+			return self.p2.x < self.p0.x
+		else:
+			return self.p1.x < self.p0.x
+
+	def ends_going_left(self):
+		if self.p1.x == self.p2.x:
+			return self.p0.x > self.p2.x
+		else:
+			return self.p1.x > self.p2.x
+
+	def get_side_vectors(self):
+		return [self.p1 - self.p0, self.p2 - self.p1]
+
 	def find_intersections(self, other):
+		if isinstance(other, LinearCurve):
+			return other.find_parabolic_curve_intersections(self)
+
 		# Construct a matrix for a linear map that makes the parabolas perpendicular
 		m1 =   self.p0.y +  self.p2.y - 2 *  self.p1.y
 		m2 = -other.p0.y - other.p2.y + 2 * other.p1.y
 		m3 =  -self.p0.x -  self.p2.x + 2 *  self.p1.x
 		m4 =  other.p0.x + other.p2.x - 2 * other.p1.x
 
-		det = m1 * m4 - m3 * m3
+		det = m1 * m4 - m2 * m3
 		if det == 0:
 			raise NotImplementedError("Parabolas with parallel axes")
 
@@ -192,50 +214,43 @@ class Curve:
 
 	def clip_until(self, t):
 		p0 = self.eval(t)
-		p1 = line_intersection(Line(p0, self.derivative(t)), Line(self.p2, self.p1 - self.p2))
 
-		return Curve(p0, p1, self.p2)
+		line1 = LinearCurve(p0, p0 + self.derivative(t))
+		line2 = LinearCurve(self.p2, self.p1)
+		intersection = find_line_intersection(line1, line2, clip=False)
+
+		if intersection is None:
+			return LinearCurve(p0, self.p2)
+
+		return make_curve(p0, intersection.get_pos(), self.p2)
 
 	def clip_after(self, t):
 		p2 = self.eval(t)
-		p1 = line_intersection(Line(p2, self.derivative(t)), Line(self.p0, self.p1 - self.p0))
 
-		return Curve(self.p0, p1, p2)
+		line1 = LinearCurve(p2, p2 + self.derivative(t))
+		line2 = LinearCurve(self.p0, self.p1)
+		intersection = find_line_intersection(line1, line2, clip=False)
+
+		if intersection is None:
+			return LinearCurve(self.p0, p2)
+
+		return make_curve(self.p0, intersection.get_pos(), p2)
 
 	def clip_after_until(self, t1, t2):
 		p0 = self.eval(t1)
 		p2 = self.eval(t2)
-		p1 = line_intersection(Line(p0, self.derivative(t1)), Line(p2, self.derivative(t2)))
 
-		return Curve(p0, p1, p2)
+		line1 = LinearCurve(p0, p0 + self.derivative(t1))
+		line2 = LinearCurve(p2, p2 + self.derivative(t2))
+		intersection = find_line_intersection(line1, line2, clip=False)
 
-class Line:
-	def __init__(self, pos, dir):
-		self.pos = pos
-		self.dir = dir
+		if intersection is None:
+			return LinearCurve(p0, p2)
 
-def line_intersection(l1, l2):
-	t = (l2.dir.x * (l1.pos.y - l2.pos.y) + l2.dir.y * (l2.pos.x - l1.pos.x)) / (l1.dir.x * l2.dir.y - l2.dir.x * l1.dir.y)
+		return make_curve(p0, intersection.get_pos(), p2)
 
-	return l1.pos + l1.dir * t
-
-
-class CurveIntersection:
-	def __init__(self, curve1, curve2, t1, t2):
-		self.curve1 = curve1
-		self.curve2 = curve2
-		self.t1 = t1
-		self.t2 = t2
-
-	def get_pos(self):
-		# return self.curve1.eval(self.t1)
-		return self.curve2.eval(self.t2)
-
-	def get_pos_x(self):
-		# return self.curve1.eval_x(self.t1)
-		return self.curve2.eval_x(self.t2)
-
-	def get_pos_y(self):
-		# return self.curve1.eval_y(self.t1)
-		return self.curve2.eval_y(self.t2)
-
+def make_curve(p0, p1, p2):
+	if (p0.x - p1.x) * (p2.y - p1.y) == (p0.y - p1.y) * (p2.x - p1.x):
+		return LinearCurve(p0, p2)
+	else:
+		return ParabolicCurve(p0, p1, p2)

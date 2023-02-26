@@ -1,10 +1,10 @@
 from math import floor, ceil
 import pyray
 from numpy import sign
-from util.vector2 import IntVec2, get_angle_between
-from geometry.curve import Curve, CurveIntersection
+from util import IntVec2, get_angle_between
+from geometry import make_curve
 
-test_intersections = []
+# test_intersections = []
 
 class Loop:
 	# turning_number should be 1 if the curve is
@@ -33,9 +33,9 @@ class Loop:
 
 		curves = []
 		for i in range(1, len(points) - 1, 2):
-			curves.append(Curve(points[i], points[i + 1], points[i + 2]))
+			curves.append(make_curve(points[i], points[i + 1], points[i + 2]))
 
-		curves.append(Curve(points[-1], points[0], points[1]))
+		curves.append(make_curve(points[-1], points[0], points[1]))
 
 		return cls(curves)
 
@@ -54,33 +54,25 @@ class Loop:
 		parity = 0
 
 		for curve in self.curves:
-			x_coords = (curve.p0.x, curve.p1.x, curve.p2.x)
-			y_coords = (curve.p0.y, curve.p1.y, curve.p2.y)
+			bbox = curve.get_bounding_box()
 
-			left_bound_x   = min(x_coords)
-			right_bound_x  = max(x_coords)
-			bottom_bound_y = min(y_coords)
-			top_bound_y    = max(y_coords)
-
-			if top_bound_y <= line_start_y:
+			if bbox.top_y <= line_start_y:
 				parity += curve.parity_of_vertical_line_intersections(line_x)
 
-			elif left_bound_x <= line_x <= right_bound_x and bottom_bound_y <= line_start_y:
+			elif bbox.left_x <= line_x <= bbox.right_x and bbox.bottom_y <= line_start_y:
 				for y in curve.find_vertical_line_intersections(line_x):
 					if y <= line_start_y:
 						parity += 1
 
-			if line_x == curve.p0.x and line_start_y > curve.p0.y:
-				to_the_left = (curve.p1.x if curve.p1.x else curve.p2.x) < line_x
+			if line_x == curve.p0.x \
+			and line_start_y > curve.p0.y \
+			and curve.starts_going_left():
+				parity += 1
 
-				if to_the_left:
-					parity += 1
-
-			if line_x == curve.p2.x and line_start_y > curve.p2.y:
-				from_the_right = (curve.p1.x if curve.p1.x else curve.p0.x) > line_x
-
-				if from_the_right:
-					parity += 1
+			if line_x == curve.p2.x \
+			and line_start_y > curve.p2.y \
+			and curve.ends_going_left():
+				parity += 1
 
 		return bool(parity & 1)
 
@@ -110,8 +102,7 @@ class Loop:
 
 		side_vectors = []
 		for curve in self.curves:
-			side_vectors.append(curve.p1 - curve.p0)
-			side_vectors.append(curve.p2 - curve.p1)
+			side_vectors += curve.get_side_vectors()
 
 		for i in range(len(side_vectors) - 1):
 			angle += get_angle_between(side_vectors[i], side_vectors[i + 1])
@@ -161,8 +152,8 @@ class Loop:
 		print(f"intersections_by_loop: {intersections_by_loop}")
 		print(f"all_intersections: {all_intersections}")
 
-		global test_intersections
-		test_intersections += all_intersections
+		# global test_intersections
+		# test_intersections += all_intersections
 		return all_intersections
 
 	def merge_to(self, loops):
@@ -275,7 +266,7 @@ class LoopIntersection:
 		else:
 			raise NotImplementedError(
 				f"Intersecting loops must have the same turning number (1 or -1)."
-				f"\n(They were {self.loops[0].turning_number} and {self.loops[1].self.loops[0].turning_number})"
+				f"\n(They were {self.loops[0].turning_number} and {self.loops[1].turning_number})"
 			)
 
 	def __repr__(self):

@@ -1,14 +1,12 @@
 from math import sin, cos, pi, degrees
 import pyray
-from ui.window import *
-from util.vector2 import IntVec2
-from geometry.curve import Curve
-from geometry.loop import Loop
-from ui.button import Button, ButtonSystem
+import ui
+from util import IntVec2
+from geometry import Loop
 
 class LoopView:
 	def __init__(self):
-		mid = IntVec2(screen_width, screen_height) // 2
+		mid = IntVec2(ui.screen_width, ui.screen_height) // 2
 		points = [mid + IntVec2(300, 0)]
 
 		for i in range(1, 6):
@@ -19,7 +17,7 @@ class LoopView:
 
 		points.append((points[0] + points[-1]) // 2)
 
-		self.buttons = ButtonSystem(*[Button(*point) for point in points])
+		self.buttons = ui.ButtonSystem(*[ui.Button(*point) for point in points])
 
 	def update(self):
 		self.buttons.update()
@@ -42,7 +40,7 @@ class LoopView:
 		self.turning_angle = f"Sum of turning angles: {int(degrees(self.loop.calculate_turning_angle()))}°"
 
 	def draw(self):
-		self.loop.draw(main_color)
+		self.loop.draw(ui.main_color)
 		self.loop.draw_lines()
 		self.buttons.draw()
 

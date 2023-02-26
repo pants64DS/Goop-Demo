@@ -1,4 +1,4 @@
-from geometry.loop import Loop
+from geometry import Loop
 
 class LoopSystem:
 	def __init__(self, *cells):
