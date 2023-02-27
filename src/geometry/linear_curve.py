@@ -6,11 +6,12 @@ class LinearCurve:
 		self.p0 = p0
 		self.p2 = p2
 
+	# Currently yellow is used instead of the given color to highlight linear curves
 	def draw(self, color, thickness=2):
 		pyray.draw_line_ex(
 			self.p0.to_pyray_vector2(),
 			self.p2.to_pyray_vector2(),
-			thickness, color
+			thickness, pyray.YELLOW
 		)
 
 	def draw_lines(self, color):
@@ -50,10 +51,7 @@ class LinearCurve:
 		if isinstance(other, LinearCurve):
 			intersection = find_line_intersection(self, other, clip=True)
 
-			if intersection is None:
-				return []
-
-			return intersection
+			return [i for i in (intersection,) if i is not None]
 
 		return self.find_parabolic_curve_intersections(self)
 

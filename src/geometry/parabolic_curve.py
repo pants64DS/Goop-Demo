@@ -151,6 +151,47 @@ class ParabolicCurve:
 	def get_side_vectors(self):
 		return [self.p1 - self.p0, self.p2 - self.p1]
 
+	def get_upright_coeffs(self, other): # Assumes that the axes are parallel
+		c1, b1, a1 = self.get_coeff_vectors()
+		c2, b2, a2 = other.get_coeff_vectors()
+
+		if a1.x == 0: # If already upright
+			return a1.y, b1.y, c1.y, b1.x, c1.x, a2.y, b2.y, c2.y, b2.x, c2.x
+
+		return a1.x, b1.x, c1.x, b1.x * a1.y - b1.y * a1.x, c1.x * a1.y - c1.y * a1.x, \
+		       a2.x, b2.x, c2.x, b2.x * a1.y - b2.y * a1.x, c2.x * a1.y - c2.y * a1.x
+
+	def find_parallel_parabola_intersections(self, other):
+		a1, b1, c1, d1, e1, a2, b2, c2, d2, e2 = self.get_upright_coeffs(other)
+
+		e = e1 - e2
+		a = a2*d1*d1 - a1*d2*d2
+		b = d1*(2*a2*e + b2*d2) - b1*d2*d2
+		c = a2*e*e + b2*d2*e + (c2 - c1)*d2*d2
+
+		discriminant = b*b - 4*a*c
+		if discriminant <= 0:
+			return []
+
+		if a == 0:
+			t1 = -c / b
+			if 0 <= t1 < 1:
+				t2 = (d1*t1 + e) / d2
+				if 0 <= t2 < 1:
+					return [CurveIntersection(self, other, t1, t2)]
+			return []
+
+		results = []
+
+		for sign in (-1, 1):
+			t1 = (-b + sign * sqrt(discriminant)) / (2*a)
+			if 0 <= t1 < 1:
+				t2 = (d1*t1 + e) / d2
+				if 0 <= t2 < 1:
+					results.append(CurveIntersection(self, other, t1, t2))
+
+		return results
+
 	def find_intersections(self, other):
 		if isinstance(other, LinearCurve):
 			return other.find_parabolic_curve_intersections(self)
@@ -161,9 +202,8 @@ class ParabolicCurve:
 		m3 =  -self.p0.x -  self.p2.x + 2 *  self.p1.x
 		m4 =  other.p0.x + other.p2.x - 2 * other.p1.x
 
-		det = m1 * m4 - m2 * m3
-		if det == 0:
-			raise NotImplementedError("Parabolas with parallel axes")
+		if m1 * m4 == m2 * m3:
+			return self.find_parallel_parabola_intersections(other)
 
 		# Apply the linear map to the control points
 		p0x = self.p0.x * m1 + self.p0.y * m3

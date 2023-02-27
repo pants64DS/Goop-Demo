@@ -7,15 +7,22 @@ from geometry import Loop, Cell, LoopSystem
 class CellView:
 	def __init__(self, loop):
 		self.loop_system = LoopSystem(Cell(loop))
+		self.new_radius = 100
 		self.message = None
 
 	def update(self):
 		mouse_pos = IntVec2.from_pyray_vector2(pyray.get_mouse_position())
-		points = [mouse_pos + IntVec2(100, 0)]
+
+		points = [mouse_pos + IntVec2(self.new_radius, 0)]
+
+		self.new_radius += pyray.get_mouse_wheel_move_v().y
+		if self.new_radius > 600: self.new_radius = 600
+		if self.new_radius < 10:  self.new_radius = 10
+
 
 		for i in range(1, 4):
 			angle = i * pi / 2
-			next_point = mouse_pos + IntVec2(100 * cos(angle), 100 * sin(angle))
+			next_point = mouse_pos + IntVec2(self.new_radius * cos(angle), self.new_radius * sin(angle))
 			points.append((points[-1] + next_point) // 2)
 			points.append(next_point)
 

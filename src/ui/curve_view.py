@@ -14,11 +14,27 @@ class CurveView:
 			ui.Button(1010, 546)
 		)
 
+		self.message = None
+
 	def update(self):
 		self.buttons.update()
-		self.curve1 = make_curve(*[self.buttons[i].pos for i in range(0, 3)])
-		self.curve2 = make_curve(*[self.buttons[i].pos for i in range(3, 6)])
-		self.intersections = self.curve1.find_intersections(self.curve2)
+		# self.buttons[0].pos.y &= ~1
+		# self.buttons[2].pos.y &= ~1
+		# self.buttons[3].pos.y &= ~1
+		# self.buttons[5].pos.y &= ~1
+
+		# self.buttons[1].pos.y = (self.buttons[0].pos.y + self.buttons[2].pos.y) >> 1
+		# self.buttons[4].pos.y = (self.buttons[3].pos.y + self.buttons[5].pos.y) >> 1
+
+		try:
+			self.curve1 = make_curve(*[self.buttons[i].pos for i in range(0, 3)])
+			self.curve2 = make_curve(*[self.buttons[i].pos for i in range(3, 6)])
+			self.intersections = self.curve1.find_intersections(self.curve2)
+		except NotImplementedError as e:
+			self.message = f"Unimplemented: {e}"
+			self.intersections = []
+		else:
+			self.message = ""
 
 		self.mouse_pos = IntVec2.from_pyray_vector2(pyray.get_mouse_position())
 
@@ -42,3 +58,6 @@ class CurveView:
 		for intersection in self.intersections:
 			x, y = intersection.get_pos()
 			pyray.draw_circle_lines(x, y, 10, pyray.RED)
+
+		if self.message:
+			pyray.draw_text(self.message, 50, 50, 30, pyray.RED)
