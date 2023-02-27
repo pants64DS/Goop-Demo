@@ -1,10 +1,11 @@
 import pyray
+from util import IntVec2
 from geometry.curve_helpers import BoundingBox, CurveIntersection
 
 class LinearCurve:
 	def __init__(self, p0, p2):
-		self.p0 = p0
-		self.p2 = p2
+		self.p0 = IntVec2(p0)
+		self.p2 = IntVec2(p2)
 
 	# Currently yellow is used instead of the given color to highlight linear curves
 	def draw(self, color, thickness=2):
@@ -42,10 +43,43 @@ class LinearCurve:
 		if self.parity_of_vertical_line_intersections(line_x) == 0:
 			return []
 
-		return [self.eval_y((line_x - self.p0.x) / (self.p2.x - self.p0.x))]
+		return [(line_x - self.p0.x) / (self.p2.x - self.p0.x)]
 
 	def find_parabolic_curve_intersections(self, other):
-		raise NotImplementedError("An intersection between a parabola and a line")
+		if self.p0.x == self.p2.x:
+			if self.p0.y == self.p2.y:
+				return []
+
+			line_x = self.p0.x
+			curve = other
+
+			start_y = self.p0.y
+			end_y = self.p2.y
+		else:
+			a = self.p0.y - self.p2.y
+			b = self.p2.x - self.p0.x
+
+			p0 = IntVec2(a * other.p0.x + b * other.p0.y, other.p0.x)
+			p1 = IntVec2(a * other.p1.x + b * other.p1.y, other.p1.x)
+			p2 = IntVec2(a * other.p2.x + b * other.p2.y, other.p2.x)
+
+			line_x = self.p0.y * self.p2.x - self.p0.x * self.p2.y
+			curve = type(other)(p0, p1, p2)
+
+			start_y = self.p0.x
+			end_y = self.p2.x
+
+		roots = curve.find_vertical_line_intersections(line_x)
+		results = []
+
+		for root in roots:
+			h = end_y - start_y
+			y = curve.eval_y(root) - start_y
+
+			if 0 <= y*h < h*h:
+				results.append(CurveIntersection(other, self, root, y / h))
+
+		return results
 
 	def find_intersections(self, other):
 		if isinstance(other, LinearCurve):
@@ -53,7 +87,7 @@ class LinearCurve:
 
 			return [i for i in (intersection,) if i is not None]
 
-		return self.find_parabolic_curve_intersections(self)
+		return self.find_parabolic_curve_intersections(other)
 
 	def starts_going_left(self):
 		return self.p0.x > self.p2.x

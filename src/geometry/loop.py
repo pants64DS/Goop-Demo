@@ -60,8 +60,8 @@ class Loop:
 				parity += curve.parity_of_vertical_line_intersections(line_x)
 
 			elif bbox.left_x <= line_x <= bbox.right_x and bbox.bottom_y <= line_start_y:
-				for y in curve.find_vertical_line_intersections(line_x):
-					if y <= line_start_y:
+				for t in curve.find_vertical_line_intersections(line_x):
+					if curve.eval_y(t) <= line_start_y:
 						parity += 1
 
 			if line_x == curve.p0.x \

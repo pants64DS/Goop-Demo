@@ -109,13 +109,12 @@ class ParabolicCurve:
 		pyray.draw_line(self.p1.x, self.p1.y, self.p2.x, self.p2.y, color)
 
 	def find_vertical_line_intersections(self, line_x):
-		a = self.p0.x + self.p2.x - 2 * self.p1.x
-		b = 2*(self.p1.x - self.p0.x)
-		c = self.p0.x - line_x
+		c, b, a = self.get_x_coeffs()
+		c -= line_x
 
 		if a == 0:
 			if b*c <= 0 and -b*c < b*b:
-				return [self.eval_y(-c / b)]
+				return [-c / b]
 			else:
 				return []
 
@@ -127,12 +126,10 @@ class ParabolicCurve:
 		results = []
 
 		if is_first_root_nonnegative(a, b, c) and is_first_root_below_one(a, b, c):
-			root = (-b - sqrt(b*b - 4*a*c)) / (2*a)
-			results.append(self.eval_y(root))
+			results.append((-b - sqrt(b*b - 4*a*c)) / (2*a))
 
 		if is_second_root_nonnegative(a, b, c) and is_second_root_below_one(a, b, c):
-			root = (-b + sqrt(b*b - 4*a*c)) / (2*a)
-			results.append(self.eval_y(root))
+			results.append((-b + sqrt(b*b - 4*a*c)) / (2*a))
 
 		return results
 
