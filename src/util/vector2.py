@@ -1,12 +1,12 @@
 import pyray
-from math import atan2
+import math
 
-class IntVec2:
-	def __init__(self, *args):
-		if len(args) == 1:
-			args = args[0]
+class Vector:
+	def __init__(self, *scalars):
+		if len(scalars) == 1 and isinstance(scalars[0], (list, tuple, Vector)):
+			scalars = scalars[0]
 
-		self.scalars = [int(arg) for arg in args]
+		self.scalars = [self.convert_scalar(scalar) for scalar in scalars]
 
 	@property
 	def x(self):
@@ -18,44 +18,44 @@ class IntVec2:
 
 	@x.setter
 	def x(self, value):
-		self.scalars[0] = value
+		self.scalars[0] = self.convert_scalar(value)
 
 	@y.setter
 	def y(self, value):
-		self.scalars[1] = value
+		self.scalars[1] = self.convert_scalar(value)
 
 	def __getitem__(self, key):
 		return self.scalars.__getitem__(key)
 
+	def __setitem__(self, key, value):
+		return self.scalars.__setitem__(self.convert_scalar(key))
+
 	def __add__(self, other):
-		return IntVec2(self.x + other.x, self.y + other.y)
+		return type(self)(*[a + b for a, b in zip(self.scalars, other.scalars)])
 
 	def __sub__(self, other):
-		return IntVec2(self.x - other.x, self.y - other.y)
+		return type(self)(*[a - b for a, b in zip(self.scalars, other.scalars)])
 
 	def __mul__(self, scalar):
-		return IntVec2(self.x * scalar, self.y * scalar)
+		return type(self)(*[a * scalar for a in self.scalars])
 
 	def __rmul__(self, scalar):
-		return IntVec2(self.x * scalar, self.y * scalar)
+		return type(self)(*[scalar * a for a in self.scalars])
 
 	def __floordiv__(self, scalar):
-		return IntVec2(self.x // scalar, self.y // scalar)
+		return type(self)(*[a // scalar for a in self.scalars])
 
 	def __neg__(self):
-		return IntVec2(-self.x, -self.y)
+		return type(self)(*[-a for a in self.scalars])
 
 	def __eq__(self, other):
-		return self.scalars == other.scalars
-
-	def __repr__(self):
-		return f'IntVec2({self.x}, {self.y})'
+		return all([a == b for a, b in zip(self.scalars, other.scalars)])
 
 	def __str__(self):
-		return f'({self.x}, {self.y})'
+		return f"({', '.join([str(x) for x in self.scalars])})"
 
 	def length(self):
-		return pyray.vector2_length(self.to_pyray_vector2())
+		return math.hypot(*self.scalars)
 
 	def dist(self, other):
 		return (self - other).length()
@@ -67,5 +67,19 @@ class IntVec2:
 	def from_pyray_vector2(cls, vector2):
 		return cls(vector2.x, vector2.y)
 
+class IntVec2(Vector):
+	def convert_scalar(self, scalar):
+		return int(scalar)
+
+	def __repr__(self):
+		return f"IntVec2{self}"
+
+class FloatVec2(Vector):
+	def convert_scalar(self, scalar):
+		return int(scalar)
+
+	def __repr__(self):
+		return f"IntVec2{self}"
+
 def get_angle_between(u, v):
-	return atan2(u.x*v.y - v.x*u.y, u.x*v.x + u.y*v.y)
+	return math.atan2(u.x*v.y - v.x*u.y, u.x*v.x + u.y*v.y)
