@@ -11,6 +11,7 @@ This project will be a demo application that simulates a game mechanic involving
 * [Weekly Report \#3](doc/Weekly%20Report%203.md)
 * [Weekly Report \#4](doc/Weekly%20Report%204.md)
 * [Weekly Report \#5](doc/Weekly%20Report%205.md)
+* [Weekly Report \#6](doc/Weekly%20Report%206.md)
 
 ## Installation
 1. Make sure Poetry and Python 3.8 or later are installed
