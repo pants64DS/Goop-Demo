@@ -1,6 +1,6 @@
 # Goop Demo
 
-This project will be a demo application that simulates a game mechanic involving opaque, paint-like liquid on a flat surface.
+A demo application that simulates a game mechanic involving opaque, paint-like liquid on a flat surface.
 
 ## Documentation
 * [Requirement Specification](doc/Requirement%20Specification.md)
