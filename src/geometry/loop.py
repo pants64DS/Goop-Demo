@@ -3,6 +3,7 @@ import pyray
 from numpy import sign
 from util import IntVec2, get_angle_between
 from geometry import make_curve
+from ui import draw_area
 
 # test_intersections = []
 
@@ -17,6 +18,14 @@ class Loop:
 			self.turning_number = self.calculate_turning_number()
 		else:
 			self.turning_number = turning_number
+
+	def sanitize(self):
+		self.curves = [curve for curve in self.curves if curve.p0 != curve.p2]
+
+		for i in range(len(self.curves) - 1):
+			self.curves[i].p2 = self.curves[i + 1].p0
+
+		self.curves[-1].p2 = self.curves[0].p0
 
 	def eval(self, t):
 		index = floor(t)
@@ -41,7 +50,10 @@ class Loop:
 
 	def draw(self, color, thickness=2):
 		for curve in self.curves:
-			curve.draw(color)
+			curve.draw(color, thickness)
+
+	def draw_inside(self):
+		draw_area(self.curves)
 
 	def draw_lines(self):
 		for curve in self.curves:
@@ -189,6 +201,7 @@ class Loop:
 			if intersection is first_intersection:
 				break
 
+		new_loop.sanitize()
 		new_loop.turning_number = new_loop.calculate_turning_number()
 		return new_loop, []
 

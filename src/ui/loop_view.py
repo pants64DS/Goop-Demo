@@ -40,6 +40,7 @@ class LoopView:
 		self.turning_angle = f"Sum of turning angles: {int(degrees(self.loop.calculate_turning_angle()))}°"
 
 	def draw(self):
+		self.loop.draw_inside()
 		self.loop.draw(ui.main_color)
 		self.loop.draw_lines()
 		self.buttons.draw()

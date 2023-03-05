@@ -110,6 +110,9 @@ class LinearCurve:
 	def clip_after_until(self, t1, t2):
 		return LinearCurve(self.eval(t1), self.eval(t2))
 
+	def transformed(self, f):
+		return LinearCurve(f(self.p0), f(self.p2))
+
 def find_line_intersection(line1, line2, clip):
 	dir1 = line1.p2 - line1.p0
 	dir2 = line2.p2 - line2.p0

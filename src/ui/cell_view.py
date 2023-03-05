@@ -41,9 +41,7 @@ class CellView:
 		assert self.new_loop.calculate_turning_number() == 1
 
 	def draw(self):
-		a = ("123434"
-			"6789")
-		assert(a == "1234346789")
+		self.loop_system.draw_inside()
 		self.loop_system.draw(ui.main_color)
 		self.new_loop.draw(ui.main_color)
 

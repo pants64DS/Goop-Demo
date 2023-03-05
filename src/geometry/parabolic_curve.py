@@ -81,7 +81,7 @@ class ParabolicCurve:
 			elif self.p2.x < self.p0.x:
 				return int(self.p1.x <= line_x)
 			else:
-				return 0
+				return 1
 
 		if line_x == self.p2.x:
 			if self.p0.x < self.p2.x:
@@ -105,8 +105,11 @@ class ParabolicCurve:
 		)
 
 	def draw_lines(self, color):
-		pyray.draw_line(self.p0.x, self.p0.y, self.p1.x, self.p1.y, color)
-		pyray.draw_line(self.p1.x, self.p1.y, self.p2.x, self.p2.y, color)
+		color1 = pyray.GREEN if self.p0.x == self.p1.x else color
+		color2 = pyray.GREEN if self.p2.x == self.p1.x else color
+
+		pyray.draw_line(self.p0.x, self.p0.y, self.p1.x, self.p1.y, color1)
+		pyray.draw_line(self.p1.x, self.p1.y, self.p2.x, self.p2.y, color2)
 
 	def find_vertical_line_intersections(self, line_x):
 		c, b, a = self.get_x_coeffs()
@@ -120,16 +123,22 @@ class ParabolicCurve:
 
 		discriminant = b*b - 4*a*c
 
-		if discriminant <= 0:
+		if discriminant < 0:
 			return []
+
+		if discriminant == 0:
+			if c == 0:
+				return [-b / (2*a)]
+			else:
+				return []
 
 		results = []
 
 		if is_first_root_nonnegative(a, b, c) and is_first_root_below_one(a, b, c):
-			results.append((-b - sqrt(b*b - 4*a*c)) / (2*a))
+			results.append((-b - sqrt(discriminant)) / (2*a))
 
 		if is_second_root_nonnegative(a, b, c) and is_second_root_below_one(a, b, c):
-			results.append((-b + sqrt(b*b - 4*a*c)) / (2*a))
+			results.append((-b + sqrt(discriminant)) / (2*a))
 
 		return results
 
@@ -286,7 +295,14 @@ class ParabolicCurve:
 
 		return make_curve(p0, intersection.get_pos(), p2)
 
+	def transformed(self, f):
+		return make_curve(f(self.p0), f(self.p1), f(self.p2))
+
 def make_curve(p0, p1, p2):
+	p0 = IntVec2(p0)
+	p1 = IntVec2(p1)
+	p2 = IntVec2(p2)
+
 	if (p0.x - p1.x) * (p2.y - p1.y) == (p0.y - p1.y) * (p2.x - p1.x):
 		return LinearCurve(p0, p2)
 	else:
