@@ -59,8 +59,8 @@ class CurveView:
 		self.buttons.draw()
 
 		for intersection in self.intersections:
-			x, y = intersection.get_pos()
-			pyray.draw_circle_lines(x, y, 10, pyray.RED)
+			pos = IntVec(intersection.get_pos())
+			pyray.draw_circle_lines(*pos, 10, pyray.RED)
 
 		if self.message:
 			pyray.draw_text(self.message, 50, 50, 30, pyray.RED)

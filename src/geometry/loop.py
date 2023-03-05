@@ -246,7 +246,7 @@ class LoopIntersection:
 		pos = self.loops[0].eval(self.params[0])
 		assert pos.dist(self.loops[1].eval(self.params[1])) < 10
 
-		pyray.draw_circle_lines(pos.x, pos.y, 10, color)
+		pyray.draw_circle_lines(*IntVec(pos), 10, color)
 
 	def get_next_loop(self):
 		return self.loops[self.next_loop_id]

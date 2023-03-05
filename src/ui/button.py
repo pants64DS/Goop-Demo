@@ -39,9 +39,9 @@ class Button:
 
 	def draw(self):
 		if self.clicked:
-			pyray.draw_circle(int(self.pos.x), int(self.pos.y), self.radius, self.color)
+			pyray.draw_circle(*self.pos, self.radius, self.color)
 		else:
-			pyray.draw_circle_lines(int(self.pos.x), int(self.pos.y), self.radius, self.color)
+			pyray.draw_circle_lines(*self.pos, self.radius, self.color)
 
 class ButtonSystem:
 	def __init__(self, *buttons):

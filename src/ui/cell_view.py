@@ -62,5 +62,5 @@ class CellView:
 		# 	pos = self.loop_system.cells[0].main_loop.eval(i / 10)
 
 		# 	c = i * 255 // n
-		# 	pyray.draw_circle_lines(pos.x, pos.y, 10, pyray.Color(c, c, c, 255))
+		# 	pyray.draw_circle_lines(*IntVec(pos), 10, pyray.Color(c, c, c, 255))
 
