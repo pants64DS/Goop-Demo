@@ -1,7 +1,7 @@
 from math import sin, cos, pi, degrees
 import pyray
 import ui
-from util import IntVec2
+from util import IntVec
 from geometry import Loop, Cell, LoopSystem
 
 class CellView:
@@ -11,9 +11,9 @@ class CellView:
 		self.message = None
 
 	def update(self):
-		mouse_pos = IntVec2.from_pyray_vector2(pyray.get_mouse_position())
+		mouse_pos = IntVec.from_pyray_vector2(pyray.get_mouse_position())
 
-		points = [mouse_pos + IntVec2(self.new_radius, 0)]
+		points = [mouse_pos + IntVec(self.new_radius, 0)]
 
 		self.new_radius += pyray.get_mouse_wheel_move_v().y
 		if self.new_radius > 600: self.new_radius = 600
@@ -22,7 +22,7 @@ class CellView:
 
 		for i in range(1, 4):
 			angle = i * pi / 2
-			next_point = mouse_pos + IntVec2(self.new_radius * cos(angle), self.new_radius * sin(angle))
+			next_point = mouse_pos + IntVec(self.new_radius * cos(angle), self.new_radius * sin(angle))
 			points.append((points[-1] + next_point) // 2)
 			points.append(next_point)
 
@@ -41,7 +41,7 @@ class CellView:
 		assert self.new_loop.calculate_turning_number() == 1
 
 	def draw(self):
-		self.loop_system.draw_inside()
+		ui.draw_area(self.loop_system.get_curves())
 		self.loop_system.draw(ui.main_color)
 		self.new_loop.draw(ui.main_color)
 

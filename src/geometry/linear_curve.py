@@ -1,11 +1,11 @@
 import pyray
-from util import IntVec2
+from util import IntVec
 from geometry.curve_helpers import BoundingBox, CurveIntersection
 
 class LinearCurve:
 	def __init__(self, p0, p2):
-		self.p0 = IntVec2(p0)
-		self.p2 = IntVec2(p2)
+		self.p0 = IntVec(p0)
+		self.p2 = IntVec(p2)
 
 	# Currently yellow is used instead of the given color to highlight linear curves
 	def draw(self, color, thickness=2):
@@ -59,9 +59,9 @@ class LinearCurve:
 			a = self.p0.y - self.p2.y
 			b = self.p2.x - self.p0.x
 
-			p0 = IntVec2(a * other.p0.x + b * other.p0.y, other.p0.x)
-			p1 = IntVec2(a * other.p1.x + b * other.p1.y, other.p1.x)
-			p2 = IntVec2(a * other.p2.x + b * other.p2.y, other.p2.x)
+			p0 = IntVec(a * other.p0.x + b * other.p0.y, other.p0.x)
+			p1 = IntVec(a * other.p1.x + b * other.p1.y, other.p1.x)
+			p2 = IntVec(a * other.p2.x + b * other.p2.y, other.p2.x)
 
 			line_x = self.p0.y * self.p2.x - self.p0.x * self.p2.y
 			curve = type(other)(p0, p1, p2)

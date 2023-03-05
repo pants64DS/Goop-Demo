@@ -1,17 +1,17 @@
 from math import sin, cos, pi, degrees
 import pyray
 import ui
-from util import IntVec2
+from util import IntVec
 from geometry import Loop
 
 class LoopView:
 	def __init__(self):
-		mid = IntVec2(ui.screen_width, ui.screen_height) // 2
-		points = [mid + IntVec2(300, 0)]
+		mid = IntVec(ui.screen_width, ui.screen_height) // 2
+		points = [mid + IntVec(300, 0)]
 
 		for i in range(1, 6):
 			angle = i * pi / 3
-			next_point = mid + IntVec2(300 * cos(angle), 300 * sin(angle))
+			next_point = mid + IntVec(300 * cos(angle), 300 * sin(angle))
 			points.append((points[-1] + next_point) // 2)
 			points.append(next_point)
 
@@ -23,7 +23,7 @@ class LoopView:
 		self.buttons.update()
 
 		self.loop = Loop.from_points([button.pos for button in self.buttons])
-		self.mouse_pos = IntVec2.from_pyray_vector2(pyray.get_mouse_position())
+		self.mouse_pos = IntVec.from_pyray_vector2(pyray.get_mouse_position())
 
 		try:
 			if self.loop.is_point_inside(self.mouse_pos):
@@ -40,7 +40,7 @@ class LoopView:
 		self.turning_angle = f"Sum of turning angles: {int(degrees(self.loop.calculate_turning_angle()))}°"
 
 	def draw(self):
-		self.loop.draw_inside()
+		ui.draw_area(self.loop.curves)
 		self.loop.draw(ui.main_color)
 		self.loop.draw_lines()
 		self.buttons.draw()

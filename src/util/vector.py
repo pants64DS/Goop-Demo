@@ -67,19 +67,19 @@ class Vector:
 	def from_pyray_vector2(cls, vector2):
 		return cls(vector2.x, vector2.y)
 
-class IntVec2(Vector):
+class IntVec(Vector):
 	def convert_scalar(self, scalar):
 		return int(scalar)
 
 	def __repr__(self):
-		return f"IntVec2{self}"
+		return f"IntVec{self}"
 
-class FloatVec2(Vector):
+class FloatVec(Vector):
 	def convert_scalar(self, scalar):
 		return int(scalar)
 
 	def __repr__(self):
-		return f"IntVec2{self}"
+		return f"IntVec{self}"
 
 def get_angle_between(u, v):
 	return math.atan2(u.x*v.y - v.x*u.y, u.x*v.x + u.y*v.y)

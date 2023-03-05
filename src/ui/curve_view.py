@@ -1,7 +1,7 @@
 import pyray
 import ui
 from geometry import make_curve, LinearCurve
-from util import IntVec2
+from util import IntVec
 
 class CurveView:
 	def __init__(self):
@@ -47,7 +47,7 @@ class CurveView:
 				except NotImplementedError as e:
 					self.message += f"Unimplemented: {e}\n"
 
-		self.mouse_pos = IntVec2.from_pyray_vector2(pyray.get_mouse_position())
+		self.mouse_pos = IntVec.from_pyray_vector2(pyray.get_mouse_position())
 
 	def draw(self):
 		for curve in self.curves:

@@ -1,9 +1,8 @@
 from math import floor, ceil
 import pyray
 from numpy import sign
-from util import IntVec2, get_angle_between
+from util import IntVec, get_angle_between
 from geometry import make_curve
-from ui import draw_area
 
 # test_intersections = []
 
@@ -51,9 +50,6 @@ class Loop:
 	def draw(self, color, thickness=2):
 		for curve in self.curves:
 			curve.draw(color, thickness)
-
-	def draw_inside(self):
-		draw_area(self.curves)
 
 	def draw_lines(self):
 		for curve in self.curves:

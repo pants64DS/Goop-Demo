@@ -1,5 +1,4 @@
 from geometry import Loop
-from ui import draw_area
 
 class LoopSystem:
 	def __init__(self, *cells):
@@ -16,9 +15,6 @@ class LoopSystem:
 			curves += cell.inner_loop_system.get_curves()
 
 		return curves
-
-	def draw_inside(self):
-		return draw_area(self.get_curves())
 
 	def cut_loop(self, loop):
 		for cell in self.cells:

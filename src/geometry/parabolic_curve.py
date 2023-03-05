@@ -2,7 +2,7 @@ from math import sqrt
 import numpy
 import pyray
 from geometry import LinearCurve, find_line_intersection, BoundingBox, CurveIntersection
-from util import IntVec2
+from util import IntVec
 
 # Returns true when (-b - sqrt(bb - 4ac)) / (2a) >= 0
 def is_first_root_nonnegative(a, b, c):
@@ -34,9 +34,9 @@ def is_second_root_below_one(a, b, c):
 
 class ParabolicCurve:
 	def __init__(self, p0, p1, p2):
-		self.p0 = IntVec2(p0)
-		self.p1 = IntVec2(p1)
-		self.p2 = IntVec2(p2)
+		self.p0 = IntVec(p0)
+		self.p1 = IntVec(p1)
+		self.p2 = IntVec(p2)
 
 	def get_coeff_vectors(self):
 		return self.p0, \
@@ -128,7 +128,7 @@ class ParabolicCurve:
 
 		if discriminant == 0:
 			if c == 0:
-				return [-b / (2*a)]
+				return [0]
 			else:
 				return []
 
@@ -299,9 +299,9 @@ class ParabolicCurve:
 		return make_curve(f(self.p0), f(self.p1), f(self.p2))
 
 def make_curve(p0, p1, p2):
-	p0 = IntVec2(p0)
-	p1 = IntVec2(p1)
-	p2 = IntVec2(p2)
+	p0 = IntVec(p0)
+	p1 = IntVec(p1)
+	p2 = IntVec(p2)
 
 	if (p0.x - p1.x) * (p2.y - p1.y) == (p0.y - p1.y) * (p2.x - p1.x):
 		return LinearCurve(p0, p2)

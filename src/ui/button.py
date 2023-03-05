@@ -1,17 +1,17 @@
 import pyray
-from util import IntVec2
+from util import IntVec
 import ui
 
 class Button:
 	def __init__(self, x, y, color = ui.main_color, radius = 10):
-		self.pos = IntVec2(x, y)
+		self.pos = IntVec(x, y)
 		self.color = color
 		self.radius = radius
-		self.click_offset = IntVec2(0, 0)
+		self.click_offset = IntVec(0, 0)
 		self.clicked = False
 
 	def click(self, clicked_pos):
-		offset = self.pos - IntVec2(clicked_pos.x, clicked_pos.y)
+		offset = self.pos - IntVec(clicked_pos.x, clicked_pos.y)
 
 		if offset.length() <= self.radius:
 			self.click_offset = offset
@@ -23,7 +23,7 @@ class Button:
 		if not self.clicked:
 			return
 
-		self.pos = IntVec2(mouse_pos.x, mouse_pos.y) + self.click_offset
+		self.pos = IntVec(mouse_pos.x, mouse_pos.y) + self.click_offset
 
 		if self.pos.x < self.radius: self.pos.x = self.radius
 		if self.pos.y < self.radius: self.pos.y = self.radius

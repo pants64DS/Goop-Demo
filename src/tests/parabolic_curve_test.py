@@ -1,6 +1,6 @@
 import unittest
 from geometry import ParabolicCurve
-from util import IntVec2
+from util import IntVec
 
 class TestParabolicCurve(unittest.TestCase):
 	def setUp(self):
@@ -8,9 +8,9 @@ class TestParabolicCurve(unittest.TestCase):
 
 	def test_get_coeff_vectors(self):
 		c, b, a = self.curve.get_coeff_vectors()
-		self.assertEqual(a, IntVec2(0, 0))
-		self.assertEqual(b, IntVec2(4, 4))
-		self.assertEqual(c, IntVec2(11, 12))
+		self.assertEqual(a, IntVec(0, 0))
+		self.assertEqual(b, IntVec(4, 4))
+		self.assertEqual(c, IntVec(11, 12))
 
 	def test_get_x_coeffs(self):
 		c, b, a = self.curve.get_x_coeffs()
@@ -33,13 +33,13 @@ class TestParabolicCurve(unittest.TestCase):
 		points = [i.get_pos() for i in intersections]
 
 		self.assertEqual(len(points), 1)
-		self.assertLessEqual(points[0].dist(IntVec2(4000, 5000)), tolerance)
+		self.assertLessEqual(points[0].dist(IntVec(4000, 5000)), tolerance)
 
 		intersections = curve2.find_intersections(curve1)
 		points = [i.get_pos() for i in intersections]
 
 		self.assertEqual(len(points), 1)
-		self.assertLessEqual(points[0].dist(IntVec2(4000, 5000)), tolerance)
+		self.assertLessEqual(points[0].dist(IntVec(4000, 5000)), tolerance)
 
 	def test_two_intersections(self):
 		curve1 = ParabolicCurve((2000, 5000), (5000, 10000), (8000, 5000))
@@ -50,15 +50,15 @@ class TestParabolicCurve(unittest.TestCase):
 		points = sorted([i.get_pos() for i in intersections], key=lambda v: v.x)
 
 		self.assertEqual(len(points), 2)
-		self.assertLessEqual(points[0].dist(IntVec2(3253, 6652)), tolerance)
-		self.assertLessEqual(points[1].dist(IntVec2(7168, 6195)), tolerance)
+		self.assertLessEqual(points[0].dist(IntVec(3253, 6652)), tolerance)
+		self.assertLessEqual(points[1].dist(IntVec(7168, 6195)), tolerance)
 
 		intersections = curve2.find_intersections(curve1)
 		points = sorted([i.get_pos() for i in intersections], key=lambda v: v.x)
 
 		self.assertEqual(len(points), 2)
-		self.assertLessEqual(points[0].dist(IntVec2(3253, 6652)), tolerance)
-		self.assertLessEqual(points[1].dist(IntVec2(7168, 6195)), tolerance)
+		self.assertLessEqual(points[0].dist(IntVec(3253, 6652)), tolerance)
+		self.assertLessEqual(points[1].dist(IntVec(7168, 6195)), tolerance)
 
 	def test_three_intersections(self):
 		curve1 = ParabolicCurve((9000,  11000), (6000, 11000), (9000, 6000))
@@ -69,17 +69,17 @@ class TestParabolicCurve(unittest.TestCase):
 		points = sorted([i.get_pos() for i in intersections], key=lambda v: v.x)
 
 		self.assertEqual(len(points), 3)
-		self.assertLessEqual(points[0].dist(IntVec2(7504,  9871)), tolerance)
-		self.assertLessEqual(points[1].dist(IntVec2(8190,  7480)), tolerance)
-		self.assertLessEqual(points[2].dist(IntVec2(8498, 10957)), tolerance)
+		self.assertLessEqual(points[0].dist(IntVec(7504,  9871)), tolerance)
+		self.assertLessEqual(points[1].dist(IntVec(8190,  7480)), tolerance)
+		self.assertLessEqual(points[2].dist(IntVec(8498, 10957)), tolerance)
 
 		intersections = curve2.find_intersections(curve1)
 		points = sorted([i.get_pos() for i in intersections], key=lambda v: v.x)
 
 		self.assertEqual(len(points), 3)
-		self.assertLessEqual(points[0].dist(IntVec2(7504,  9871)), tolerance)
-		self.assertLessEqual(points[1].dist(IntVec2(8190,  7480)), tolerance)
-		self.assertLessEqual(points[2].dist(IntVec2(8498, 10957)), tolerance)
+		self.assertLessEqual(points[0].dist(IntVec(7504,  9871)), tolerance)
+		self.assertLessEqual(points[1].dist(IntVec(8190,  7480)), tolerance)
+		self.assertLessEqual(points[2].dist(IntVec(8498, 10957)), tolerance)
 
 	def test_four_intersections(self):
 		curve1 = ParabolicCurve((1000, 5000), (15000, 3000), (1000, 1000))
@@ -90,16 +90,16 @@ class TestParabolicCurve(unittest.TestCase):
 		points = sorted([i.get_pos() for i in intersections], key=lambda v: v.x)
 
 		self.assertEqual(len(points), 4)
-		self.assertLessEqual(points[0].dist(IntVec2(3292, 1360)), tolerance)
-		self.assertLessEqual(points[1].dist(IntVec2(4282, 4458)), tolerance)
-		self.assertLessEqual(points[2].dist(IntVec2(6122, 4036)), tolerance)
-		self.assertLessEqual(points[3].dist(IntVec2(6725, 2147)), tolerance)
+		self.assertLessEqual(points[0].dist(IntVec(3292, 1360)), tolerance)
+		self.assertLessEqual(points[1].dist(IntVec(4282, 4458)), tolerance)
+		self.assertLessEqual(points[2].dist(IntVec(6122, 4036)), tolerance)
+		self.assertLessEqual(points[3].dist(IntVec(6725, 2147)), tolerance)
 
 		intersections = curve2.find_intersections(curve1)
 		points = sorted([i.get_pos() for i in intersections], key=lambda v: v.x)
 
 		self.assertEqual(len(points), 4)
-		self.assertLessEqual(points[0].dist(IntVec2(3292, 1360)), tolerance)
-		self.assertLessEqual(points[1].dist(IntVec2(4282, 4458)), tolerance)
-		self.assertLessEqual(points[2].dist(IntVec2(6122, 4036)), tolerance)
-		self.assertLessEqual(points[3].dist(IntVec2(6725, 2147)), tolerance)
+		self.assertLessEqual(points[0].dist(IntVec(3292, 1360)), tolerance)
+		self.assertLessEqual(points[1].dist(IntVec(4282, 4458)), tolerance)
+		self.assertLessEqual(points[2].dist(IntVec(6122, 4036)), tolerance)
+		self.assertLessEqual(points[3].dist(IntVec(6725, 2147)), tolerance)

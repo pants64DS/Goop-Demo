@@ -1,11 +1,11 @@
 import unittest
 from math import sqrt
-from util import IntVec2
+from util import IntVec
 
-class TestIntVec2(unittest.TestCase):
+class TestIntVec(unittest.TestCase):
 	def setUp(self):
-		self.a = IntVec2(1, 2)
-		self.b = IntVec2(3, 4)
+		self.a = IntVec(1, 2)
+		self.b = IntVec(3, 4)
 
 	def test_get_x(self):
 		self.assertEqual(self.a.x, 1)
@@ -36,30 +36,30 @@ class TestIntVec2(unittest.TestCase):
 		self.assertEqual(self.b[1], 4)
 
 	def test_add(self):
-		self.assertEqual(self.a + self.b, IntVec2(4, 6))
-		self.assertEqual(self.b + self.a, IntVec2(4, 6))
+		self.assertEqual(self.a + self.b, IntVec(4, 6))
+		self.assertEqual(self.b + self.a, IntVec(4, 6))
 
 	def test_sub(self):
-		self.assertEqual(self.a - self.b, IntVec2(-2, -2))
-		self.assertEqual(self.b - self.a, IntVec2( 2,  2))
+		self.assertEqual(self.a - self.b, IntVec(-2, -2))
+		self.assertEqual(self.b - self.a, IntVec( 2,  2))
 
 	def test_mul(self):
-		self.assertEqual(self.a  * 3, IntVec2(3, 6))
-		self.assertEqual(self.b * -5, IntVec2(-15, -20))
+		self.assertEqual(self.a  * 3, IntVec(3, 6))
+		self.assertEqual(self.b * -5, IntVec(-15, -20))
 
 	def test_rmul(self):
-		self.assertEqual(3  * self.a, IntVec2(3, 6))
-		self.assertEqual(-5 * self.b, IntVec2(-15, -20))
+		self.assertEqual(3  * self.a, IntVec(3, 6))
+		self.assertEqual(-5 * self.b, IntVec(-15, -20))
 
 	def test_neg(self):
-		self.assertEqual(-self.a, IntVec2(-1, -2))
-		self.assertEqual(-self.b, IntVec2(-3, -4))
+		self.assertEqual(-self.a, IntVec(-1, -2))
+		self.assertEqual(-self.b, IntVec(-3, -4))
 
 	def test_eq(self):
 		self.assertTrue(self.a == self.a)
 		self.assertTrue(self.b == self.b)
-		self.assertTrue(self.a == IntVec2(self.a))
-		self.assertTrue(self.b == IntVec2(self.b))
+		self.assertTrue(self.a == IntVec(self.a))
+		self.assertTrue(self.b == IntVec(self.b))
 		self.assertTrue(self.a != self.b)
 		self.assertTrue(self.b != self.a)
 
@@ -68,8 +68,8 @@ class TestIntVec2(unittest.TestCase):
 		self.assertEqual(str(self.b), '(3, 4)')
 
 	def test_repr(self):
-		self.assertEqual(repr(self.a), 'IntVec2(1, 2)')
-		self.assertEqual(repr(self.b), 'IntVec2(3, 4)')
+		self.assertEqual(repr(self.a), 'IntVec(1, 2)')
+		self.assertEqual(repr(self.b), 'IntVec(3, 4)')
 
 	def test_length(self):
 		self.assertAlmostEqual(self.a.length(), sqrt(5))
