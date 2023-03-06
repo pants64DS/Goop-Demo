@@ -113,9 +113,9 @@ class LinearCurve:
 	def transformed(self, f):
 		return LinearCurve(f(self.p0), f(self.p2))
 
-def find_line_intersection(line1, line2, clip):
-	dir1 = line1.p2 - line1.p0
-	dir2 = line2.p2 - line2.p0
+def find_line_intersection(line1, line2, clip, dir1=None, dir2=None):
+	if dir1 is None: dir1 = line1.p2 - line1.p0
+	if dir2 is None: dir2 = line2.p2 - line2.p0
 
 	det = dir1.x * dir2.y - dir2.x * dir1.y
 

@@ -1,4 +1,4 @@
-from math import sqrt
+from math import sqrt, isfinite
 import numpy
 import pyray
 from geometry import LinearCurve, find_line_intersection, BoundingBox, CurveIntersection
@@ -260,10 +260,11 @@ class ParabolicCurve:
 
 	def clip_until(self, t):
 		p0 = self.eval(t)
+		dir1 = self.derivative(t)
 
-		line1 = LinearCurve(p0, p0 + self.derivative(t))
-		line2 = LinearCurve(self.p2, self.p1)
-		intersection = find_line_intersection(line1, line2, clip=False)
+		line1 = LineSegment(start=p0, offset=dir1)
+		line2 = LineSegment(start=self.p2, end=self.p1)
+		intersection = find_line_intersection(line1, line2, dir1=dir1, clip=False)
 
 		if intersection is None:
 			return LinearCurve(p0, self.p2)
@@ -272,10 +273,11 @@ class ParabolicCurve:
 
 	def clip_after(self, t):
 		p2 = self.eval(t)
+		dir1 = self.derivative(t)
 
-		line1 = LinearCurve(p2, p2 + self.derivative(t))
-		line2 = LinearCurve(self.p0, self.p1)
-		intersection = find_line_intersection(line1, line2, clip=False)
+		line1 = LineSegment(start=p2, offset=dir1)
+		line2 = LineSegment(start=self.p0, end=self.p1)
+		intersection = find_line_intersection(line1, line2, dir1=dir1, clip=False)
 
 		if intersection is None:
 			return LinearCurve(self.p0, p2)
@@ -286,9 +288,12 @@ class ParabolicCurve:
 		p0 = self.eval(t1)
 		p2 = self.eval(t2)
 
-		line1 = LinearCurve(p0, p0 + self.derivative(t1))
-		line2 = LinearCurve(p2, p2 + self.derivative(t2))
-		intersection = find_line_intersection(line1, line2, clip=False)
+		dir1 = self.derivative(t1)
+		dir2 = self.derivative(t2)
+
+		line1 = LineSegment(start=p0, offset=dir1)
+		line2 = LineSegment(start=p2, offset=dir2)
+		intersection = find_line_intersection(line1, line2, dir1=dir1, dir2=dir2, clip=False)
 
 		if intersection is None:
 			return LinearCurve(p0, p2)
@@ -298,7 +303,25 @@ class ParabolicCurve:
 	def transformed(self, f):
 		return make_curve(f(self.p0), f(self.p1), f(self.p2))
 
+# Doesn't convert coordinates to integers like LinearCurve
+class LineSegment:
+	def __init__(self, start, end=None, offset=None):
+		self.p0 = start
+
+		if offset is None:
+			self.p2 = end
+			self.offset = end - start
+		else:
+			self.p2 = start + offset
+			self.offset = offset
+
+	def eval(self, t):
+		return self.p0 + t * self.offset
+
 def make_curve(p0, p1, p2):
+	if not isinstance(p1, IntVec) and not all(isfinite(x) for x in p1):
+		return LinearCurve(p0, p2)
+
 	p0 = IntVec(p0)
 	p1 = IntVec(p1)
 	p2 = IntVec(p2)

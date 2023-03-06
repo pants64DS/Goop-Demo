@@ -8,7 +8,7 @@ def get_result_type(v, x):
 	if isinstance(x, (int, IntVec)):
 		return IntVec
 
-	if all([isinstance(y, int) for y in x]):
+	if all(isinstance(y, int) for y in x):
 		return IntVec
 
 	return FloatVec
@@ -76,7 +76,7 @@ class Vector:
 		return type(self)(*[-a for a in self.scalars])
 
 	def __eq__(self, other):
-		return all([a == b for a, b in zip(self.scalars, other.scalars)])
+		return all(a == b for a, b in zip(self.scalars, other.scalars))
 
 	def __str__(self):
 		return f"({', '.join([str(x) for x in self.scalars])})"
