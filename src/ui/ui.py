@@ -18,22 +18,24 @@ def draw_area(curves):
 		sheared_curve = og_curve.transformed(lambda p: (p.x + p.y, p.y))
 
 		bbox = sheared_curve.get_bounding_box()
-		left_x = max(bbox.left_x, 0) // line_gap * line_gap
-		right_x = min(bbox.right_x, total_width) // -line_gap * -line_gap
+		left_x = max(bbox.left_x // line_gap * line_gap, line_gap)
+		right_x = min(bbox.right_x // -line_gap * -line_gap, total_width)
 
 		for x in range(left_x, right_x + 1, line_gap):
+			i = x // line_gap - 1
+
 			if x == sheared_curve.p0.x and sheared_curve.starts_going_left():
-				intersections[x // line_gap].append(sheared_curve.p0.y)
+				intersections[i].append(sheared_curve.p0.y)
 
 			if x == sheared_curve.p2.x and sheared_curve.ends_going_left():
-				intersections[x // line_gap].append(sheared_curve.p2.y)
+				intersections[i].append(sheared_curve.p2.y)
 
 			for t in sheared_curve.find_vertical_line_intersections(x):
-				intersections[x // line_gap].append(floor(sheared_curve.eval_y(t)))
+				intersections[i].append(floor(sheared_curve.eval_y(t)))
 
 	for i, l in enumerate(intersections):
 		l.sort()
-		x = i * line_gap
+		x = (i + 1) * line_gap
 		for j in range(0, len(l) - 1, 2):
 			start_y = l[j]
 			end_y = l[j + 1]
