@@ -30,6 +30,9 @@ class LinearCurve:
 	def derivative(self, t):
 		return self.p2 - self.p0
 
+	def second_derivative(self):
+		return IntVec(0, 0)
+
 	def parity_of_vertical_line_intersections(self, line_x):
 		if self.p0.x < self.p2.x:
 			return int(self.p0.x <= line_x < self.p2.x)

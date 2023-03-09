@@ -2,7 +2,7 @@ from geometry import Loop
 
 class LoopSystem:
 	def __init__(self, *cells):
-		self.cells = cells
+		self.cells = list(cells)
 
 	def draw(self, color, thickness=2):
 		for cell in self.cells:
@@ -16,14 +16,23 @@ class LoopSystem:
 
 		return curves
 
+	def remove_none_cells(self):
+		self.cells = [cell for cell in self.cells if cell is not None]
+
 	def cut_loop(self, loop):
-		for cell in self.cells:
+		for i, cell in enumerate(self.cells):
 			if loop.intersects_with(cell.main_loop):
+				self.remove_none_cells()
 				raise NotImplementedError("Cutting cells with an intersecting loop")
 
 			elif loop.is_inside_nonintersecting(cell.main_loop):
 				cell.inner_loop_system.add_loop(loop)
-				return
+				break
+
+			elif cell.main_loop.is_inside_nonintersecting(loop):
+				self.cells[i] = None
+
+		self.remove_none_cells()
 
 	def add_loop(self, loop):
 		outer_cells = [] # Cells that are outside of loop
@@ -38,11 +47,9 @@ class LoopSystem:
 			elif cell.main_loop.is_outside_nonintersecting(loop):
 				outer_cells.append(cell)
 
-		print(f"edge cells: {len(edge_cells)}")
 		bounding_loop, new_holes = loop.merge_to([cell.main_loop for cell in edge_cells])
-		print(f"bounding loop curves: {len(bounding_loop.curves)}")
-
 		bounding_loop_insides = LoopSystem()
+
 		for cell in edge_cells:
 			bounding_loop_insides.cells += cell.inner_loop_system.cells
 
@@ -52,7 +59,7 @@ class LoopSystem:
 			cells_in_new_hole = []
 
 			for i, outer_cell in enumerate(outer_cells):
-				if outer_cell.is_inside_nonintersecting(new_hole):
+				if outer_cell.main_loop.is_inside_nonintersecting(new_hole):
 					cells_in_new_hole.append(outer_cell)
 					outer_cells[i] = None
 

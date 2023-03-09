@@ -34,6 +34,8 @@ class CellView:
 				self.loop_system.add_loop(self.new_loop)
 			except NotImplementedError as e:
 				self.message = f"Unimplemented: {e}"
+			except RuntimeError as e:
+				self.message = str(e)
 			else:
 				self.message = ""
 

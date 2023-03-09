@@ -4,7 +4,11 @@ from numpy import sign
 from util import IntVec, get_angle_between
 from geometry import make_curve
 
-# test_intersections = []
+def next_cyclic_element(l, i):
+	i += 1
+	if i < len(l):
+		return l[i]
+	return l[0]
 
 class Loop:
 	# turning_number should be 1 if the curve is
@@ -19,20 +23,28 @@ class Loop:
 			self.turning_number = turning_number
 
 	def sanitize(self):
+		if not self.curves:
+			return False
+
 		self.curves = [curve for curve in self.curves if curve.p0 != curve.p2]
 
 		for i in range(len(self.curves) - 1):
 			self.curves[i].p2 = self.curves[i + 1].p0
 
 		self.curves[-1].p2 = self.curves[0].p0
+		return True
+
+	def get_curve(self, t):
+		return self.curves[floor(t) % len(self.curves)]
 
 	def eval(self, t):
-		index = floor(t)
-		return self.curves[index].eval(t - index)
+		return self.get_curve(t).eval(t % 1)
 
 	def derivative(self, t):
-		index = floor(t)
-		return self.curves[index].derivative(t - index)
+		return self.get_curve(t).derivative(t % 1)
+
+	def second_derivative(self, t):
+		return self.get_curve(t).second_derivative()
 
 	@classmethod
 	def from_points(cls, points):
@@ -131,7 +143,7 @@ class Loop:
 				for curve_intersection in curve1.find_intersections(curve2):
 					results.append(LoopIntersection(curve_intersection, loop1, loop2, curve1_id, curve2_id))
 
-		return sorted(results, key=lambda intersection: intersection.params[1])
+		return results
 
 	def get_intersections(self, other_loops):
 		intersections_by_loop = []
@@ -140,29 +152,55 @@ class Loop:
 		for other in other_loops:
 			new_intersections = Loop.get_intersections_between(self, other)
 			all_intersections += new_intersections
+
+			new_intersections.sort(key=lambda intersection: intersection.params[1])
 			intersections_by_loop.append(new_intersections)
 
 		all_intersections.sort(key=lambda intersection: intersection.params[0])
 
 		for i in range(len(all_intersections)):
-			if all_intersections[i].get_next_loop() is self:
-				next_index = (i + 1) % len(all_intersections)
+			if all_intersections[i].get_next_preferred_loop() is self:
+				all_intersections[i].next_preferred_intersection \
+					= next_cyclic_element(all_intersections, i)
 
-				all_intersections[i].next_intersection = all_intersections[next_index]
+			if all_intersections[i].get_next_alternative_loop() is self:
+				all_intersections[i].next_alternative_intersection \
+					= next_cyclic_element(all_intersections, i)
 
 		for loop, intersections in zip(other_loops, intersections_by_loop):
 			for i in range(len(intersections)):
-				if intersections[i].get_next_loop() is loop:
-					next_index = (i + 1) % len(intersections)
+				if intersections[i].get_next_preferred_loop() is loop:
+					intersections[i].next_preferred_intersection \
+						= next_cyclic_element(intersections, i)
 
-					intersections[i].next_intersection = intersections[next_index]
+				if intersections[i].get_next_alternative_loop() is loop:
+					intersections[i].next_alternative_intersection \
+						= next_cyclic_element(intersections, i)
 
-		print(f"intersections_by_loop: {intersections_by_loop}")
-		print(f"all_intersections: {all_intersections}")
-
-		# global test_intersections
-		# test_intersections += all_intersections
 		return all_intersections
+
+	@staticmethod
+	def trace_intersections(results, curr_node):
+		if results and curr_node == results[0]:
+			return True
+
+		# If already visited
+		if curr_node.followed_loop_id is not None:
+			raise RuntimeError("Intersection already visited when creating a loop")
+			# return False
+
+		results.append(curr_node)
+		num_results = len(results)
+
+		curr_node.followed_loop_id = curr_node.next_preferred_loop_id
+
+		if Loop.trace_intersections(results, curr_node.next_preferred_intersection):
+			return True
+
+		curr_node.followed_loop_id = int(not curr_node.next_preferred_loop_id)
+
+		return Loop.trace_intersections(results[:num_results], \
+			curr_node.next_alternative_intersection)
 
 	def merge_to(self, loops):
 		if not loops:
@@ -170,56 +208,43 @@ class Loop:
 
 		intersections = self.get_intersections(loops)
 
-		# result_loops = []
-		new_loop = Loop([], 0)
+		results = []
 
-		loops.append(self)
+		for start_intersection in intersections:
+			if start_intersection.followed_loop_id is not None:
+				continue
 
-		first_intersection = intersections[0]
-		intersection = first_intersection
+			new_intersections = []
+			Loop.trace_intersections(new_intersections, start_intersection)
 
-		while True:
-			print("-----------------")
-			print(f"curr intersection: {intersection}")
-			print(f"next intersection: {intersection.next_intersection}")
+			new_loop = Loop([], 0)
+			for intersection in new_intersections:
+				interval = intersection.get_followed_interval()
+				new_loop.curves += intersection.get_followed_loop().clip_interval(*interval)
 
-			start = intersection.params[intersection.next_loop_id]
-			end = intersection.next_intersection.params[intersection.next_loop_id]
+			if not new_loop.sanitize():
+				continue
 
-			# start, end = sorted([start, end])
+			new_loop.turning_number = new_loop.calculate_turning_number()
 
-			print(f"start: {start}")
-			print(f"end:   {end}")
+			if new_loop.turning_number == self.turning_number:
+				bounding_loop = new_loop
 
-			new_loop.curves += intersection.get_next_loop().clip_interval(start, end)
-			intersection = intersection.next_intersection
+			results.append(new_loop)
 
-			if intersection is first_intersection:
-				break
-
-		new_loop.sanitize()
-		new_loop.turning_number = new_loop.calculate_turning_number()
-		return new_loop, []
+		return bounding_loop, [loop for loop in results if loop is not bounding_loop]
 
 	def clip_interval(self, start, end):
 		if start == end:
 			return []
 
-		print(f"clipping an interval from {start} to {end}")
+		start_curve_id = floor(start) % len(self.curves)
+		end_curve_id = floor(end) % len(self.curves)
 
-		start_curve_id = floor(start)
-		end_curve_id = ceil(end) - 1
-
-		t1 = start - start_curve_id
-		t2 = end - end_curve_id
-
-		print(f"start_curve_id: {start_curve_id}")
-		print(f"end_curve_id:   {end_curve_id}")
-		print(f"t1:             {t1}")
-		print(f"t2:             {t2}")
+		t1 = start % 1
+		t2 = end % 1
 
 		if start_curve_id == end_curve_id and t1 < t2:
-			print("using clip_after_until")
 			return [self.curves[start_curve_id].clip_after_until(t1, t2)]
 
 		new_curves = [self.curves[start_curve_id].clip_until(t1)]
@@ -231,7 +256,6 @@ class Loop:
 
 		new_curves.append(self.curves[end_curve_id].clip_after(t2))
 
-		print(f"{len(new_curves)} curves added")
 		return new_curves
 
 class LoopIntersection:
@@ -240,7 +264,9 @@ class LoopIntersection:
 		self.loops = (loop1, loop2)
 
 		self.set_next_loop_id()
-		self.next_intersection = None
+		self.next_preferred_intersection = None
+		self.next_alternative_intersection = None
+		self.followed_loop_id = None
 
 	def draw(self, color):
 		pos = self.loops[0].eval(self.params[0])
@@ -248,29 +274,52 @@ class LoopIntersection:
 
 		pyray.draw_circle_lines(*IntVec(pos), 10, color)
 
-	def get_next_loop(self):
-		return self.loops[self.next_loop_id]
+	def get_next_preferred_loop(self):
+		return self.loops[self.next_preferred_loop_id]
+
+	def get_next_alternative_loop(self):
+		return self.loops[not self.next_preferred_loop_id]
+
+	def get_followed_loop(self):
+		return self.loops[self.followed_loop_id]
+
+	def get_followed_intersection(self):
+		return (self.next_preferred_intersection, \
+			self.next_alternative_intersection)[self.followed_loop_id != self.next_preferred_loop_id]
+
+	def get_followed_interval(self):
+		start = self.params[self.followed_loop_id]
+		end = self.get_followed_intersection().params[self.followed_loop_id]
+
+		return start, end
+
+	def get_next_preferred_interval(self):
+		start = self.params[self.next_preferred_loop_id]
+		end = self.next_preferred_intersection.params[self.next_preferred_loop_id]
+
+		return start, end
 
 	def set_next_loop_id(self):
 		dir1 = self.loops[0].derivative(self.params[0])
 		dir2 = self.loops[1].derivative(self.params[1])
 
-		det = dir1.x * dir2.y - dir2.x * dir1.y
+		x1y2 = dir1.x * dir2.y
+		x2y1 = dir2.x * dir1.y
 
-		if det == 0:
+		if x1y2 == x2y1:
 			raise NotImplementedError("Loops are tangential at an intersection point")
 
 		if self.loops[0].turning_number == self.loops[1].turning_number == 1:
-			if det > 0:
-				self.next_loop_id = 0
+			if x1y2 > x2y1:
+				self.next_preferred_loop_id = 0
 			else:
-				self.next_loop_id = 1
+				self.next_preferred_loop_id = 1
 
 		elif self.loops[0].turning_number == self.loops[1].turning_number == -1:
-			if det > 0:
-				self.next_loop_id = 1
+			if x1y2 > x2y1:
+				self.next_preferred_loop_id = 1
 			else:
-				self.next_loop_id = 0
+				self.next_preferred_loop_id = 0
 
 		else:
 			raise NotImplementedError(
@@ -279,4 +328,4 @@ class LoopIntersection:
 			)
 
 	def __repr__(self):
-		return f"LoopIntersection(params: {self.params}, next_loop_id: {self.next_loop_id})"
+		return f"LoopIntersection(params: {self.params}, next_preferred_loop_id: {self.next_preferred_loop_id})"

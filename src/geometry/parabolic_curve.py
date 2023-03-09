@@ -73,6 +73,9 @@ class ParabolicCurve:
 
 		return coeffs[1] + 2 * coeffs[2] * t
 
+	def second_derivative(self):
+		return 2 * (self.p0 + self.p2 - 2 * self.p1)
+
 	def parity_of_vertical_line_intersections(self, line_x):
 		# The edge cases here are the most complicated
 		if line_x == self.p0.x:
