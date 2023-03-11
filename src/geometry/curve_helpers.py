@@ -16,14 +16,20 @@ class CurveIntersection:
 		self.t1 = t1
 		self.t2 = t2
 
-	def get_pos(self):
-		return self.curve1.eval(self.t1)
-		# return self.curve2.eval(self.t2)
+	def get_pos(self, on_curve1=True):
+		if on_curve1:
+			return self.curve1.eval(self.t1)
+		else:
+			return self.curve2.eval(self.t2)
 
-	def get_pos_x(self):
-		return self.curve1.eval_x(self.t1)
-		# return self.curve2.eval_x(self.t2)
+	def get_pos_x(self, on_curve1=True):
+		if on_curve1:
+			return self.curve1.eval_x(self.t1)
+		else:
+			return self.curve2.eval_x(self.t2)
 
-	def get_pos_y(self):
-		return self.curve1.eval_y(self.t1)
-		# return self.curve2.eval_y(self.t2)
+	def get_pos_y(self, on_curve1=True):
+		if on_curve1:
+			return self.curve1.eval_y(self.t1)
+		else:
+			return self.curve2.eval_y(self.t2)

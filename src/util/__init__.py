@@ -1,1 +1,1 @@
-from util.vector import IntVec, get_angle_between
+from util.vector import Vector, IntVec, FloatVec, get_angle_between

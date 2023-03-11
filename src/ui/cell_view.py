@@ -45,7 +45,7 @@ class CellView:
 	def draw(self):
 		ui.draw_area(self.loop_system.get_curves())
 		self.loop_system.draw(ui.main_color)
-		self.new_loop.draw(ui.main_color)
+		self.new_loop.draw(pyray.BLUE)
 
 		if self.message:
 			pyray.draw_text(self.message, 50, 50, 30, pyray.RED)
