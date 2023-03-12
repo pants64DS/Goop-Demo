@@ -8,14 +8,14 @@ class LinearCurve:
 		self.p2 = IntVec(p2)
 
 	# Currently yellow is used instead of the given color to highlight linear curves
-	def draw(self, color, thickness=2):
+	def draw(self, color, thickness=2): # pragma: no cover
 		pyray.draw_line_ex(
 			self.p0.to_pyray_vector2(),
 			self.p2.to_pyray_vector2(),
 			thickness, pyray.YELLOW
 		)
 
-	def draw_lines(self, color):
+	def draw_lines(self, color): # pragma: no cover
 		pass
 
 	def eval(self, t):
@@ -115,6 +115,9 @@ class LinearCurve:
 
 	def transformed(self, f):
 		return LinearCurve(f(self.p0), f(self.p2))
+
+	def change_endpoint(self, new_endpoint):
+		return LinearCurve(self.p0, new_endpoint)
 
 def find_line_intersection(line1, line2, clip, dir1=None, dir2=None):
 	if dir1 is None: dir1 = line1.p2 - line1.p0

@@ -4,7 +4,7 @@ class LoopSystem:
 	def __init__(self, *cells):
 		self.cells = list(cells)
 
-	def draw(self, color, thickness=2):
+	def draw(self, color, thickness=2): # pragma: no cover
 		for cell in self.cells:
 			cell.draw(color, thickness)
 
@@ -78,6 +78,6 @@ class Cell:
 		self.main_loop = main_loop
 		self.inner_loop_system = inner_loop_system
 
-	def draw(self, color, thickness=2):
+	def draw(self, color, thickness=2): # pragma: no cover
 		self.inner_loop_system.draw(color, thickness)
 		self.main_loop.draw(color, thickness)

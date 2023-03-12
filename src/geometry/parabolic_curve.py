@@ -99,7 +99,7 @@ class ParabolicCurve:
 	def get_bounding_box(self):
 		return BoundingBox(self.p0, self.p1, self.p2)
 
-	def draw(self, color, thickness=2):
+	def draw(self, color, thickness=2): # pragma: no cover
 		pyray.draw_line_bezier_quad(
 			self.p0.to_pyray_vector2(),
 			self.p2.to_pyray_vector2(),
@@ -107,7 +107,7 @@ class ParabolicCurve:
 			thickness, color
 		)
 
-	def draw_lines(self, color):
+	def draw_lines(self, color): # pragma: no cover
 		color1 = pyray.GREEN if self.p0.x == self.p1.x else color
 		color2 = pyray.GREEN if self.p2.x == self.p1.x else color
 
@@ -305,6 +305,9 @@ class ParabolicCurve:
 
 	def transformed(self, f):
 		return make_curve(f(self.p0), f(self.p1), f(self.p2))
+
+	def change_endpoint(self, new_endpoint):
+		return make_curve(self.p0, self.p1, new_endpoint)
 
 # Doesn't convert coordinates to integers like LinearCurve
 class LineSegment:

@@ -29,9 +29,9 @@ class Loop:
 		self.curves = [curve for curve in self.curves if curve.p0 != curve.p2]
 
 		for i in range(len(self.curves) - 1):
-			self.curves[i].p2 = self.curves[i + 1].p0
+			self.curves[i] = self.curves[i].change_endpoint(self.curves[i + 1].p0)
 
-		self.curves[-1].p2 = self.curves[0].p0
+		self.curves[-1] = self.curves[-1].change_endpoint(self.curves[0].p0)
 		return True
 
 	def get_curve(self, t):
@@ -59,15 +59,15 @@ class Loop:
 
 		return cls(curves)
 
-	def draw(self, color, thickness=2):
+	def draw(self, color, thickness=2): # pragma: no cover
 		for curve in self.curves:
 			curve.draw(color, thickness)
 
-	def draw_lines(self):
+	def draw_lines(self): # pragma: no cover
 		for curve in self.curves:
 			curve.draw_lines(pyray.RED)
 
-	# Assumes that the loops don't intersect
+	# Assumes that the loop doesn't intersect itself
 	def is_point_inside(self, point):
 		line_x = point.x
 		line_start_y = point.y
@@ -268,7 +268,7 @@ class LoopIntersection:
 		self.next_alternative_intersection = None
 		self.followed_loop_id = None
 
-	def draw(self, color):
+	def draw(self, color): # pragma: no cover
 		pos = self.loops[0].eval(self.params[0])
 		assert pos.dist(self.loops[1].eval(self.params[1])) < 10
 
