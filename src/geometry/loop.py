@@ -326,6 +326,3 @@ class LoopIntersection:
 				f"Intersecting loops must have the same turning number (1 or -1)."
 				f"\n(They were {self.loops[0].turning_number} and {self.loops[1].turning_number})"
 			)
-
-	def __repr__(self):
-		return f"LoopIntersection(params: {self.params}, next_preferred_loop_id: {self.next_preferred_loop_id})"

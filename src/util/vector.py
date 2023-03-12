@@ -20,27 +20,30 @@ class Vector:
 
 		self.scalars = [self.convert_scalar(scalar) for scalar in scalars]
 
-	@property
-	def x(self):
-		return self.scalars[0]
-
-	@property
-	def y(self):
-		return self.scalars[1]
-
-	@x.setter
-	def x(self, value):
-		self.scalars[0] = self.convert_scalar(value)
-
-	@y.setter
-	def y(self, value):
-		self.scalars[1] = self.convert_scalar(value)
-
 	def __getitem__(self, key):
 		return self.scalars.__getitem__(key)
 
 	def __setitem__(self, key, value):
-		return self.scalars.__setitem__(self.convert_scalar(key))
+		return self.scalars.__setitem__(key, self.convert_scalar(value))
+
+	def __len__(self):
+		return len(self.scalars)
+
+	@property
+	def x(self):
+		return self[0]
+
+	@property
+	def y(self):
+		return self[1]
+
+	@x.setter
+	def x(self, value):
+		self[0] = value
+
+	@y.setter
+	def y(self, value):
+		self[1] = value
 
 	def __add__(self, other):
 		result = [a + b for a, b in zip(self, other)]
@@ -70,16 +73,19 @@ class Vector:
 	def __truediv__(self, scalar):
 		result = [a / scalar for a in self]
 
-		return FloatVec(self, scalar)(*result)
+		return FloatVec(*result)
 
 	def __neg__(self):
 		return type(self)(*[-a for a in self])
 
 	def __eq__(self, other):
-		return all(a == b for a, b in zip(self, other))
+		return len(self) == len(other) and all(a == b for a, b in zip(self, other))
 
 	def __str__(self):
 		return f"({', '.join([str(x) for x in self])})"
+
+	def __repr__(self):
+		return type(self).__name__ + str(self)
 
 	def length(self):
 		return math.hypot(*self)
@@ -98,15 +104,9 @@ class IntVec(Vector):
 	def convert_scalar(self, scalar):
 		return int(scalar)
 
-	def __repr__(self):
-		return f"IntVec{self}"
-
 class FloatVec(Vector):
 	def convert_scalar(self, scalar):
 		return float(scalar)
-
-	def __repr__(self):
-		return f"FloatVec{self}"
 
 def get_angle_between(u, v):
 	return math.atan2(u.x*v.y - v.x*u.y, u.x*v.x + u.y*v.y)
