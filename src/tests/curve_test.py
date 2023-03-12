@@ -1,10 +1,24 @@
+from math import degrees
 import unittest
 from geometry import make_curve
-from util import IntVec
+from util import IntVec, get_angle_between
 
 class TestCurves(unittest.TestCase):
 	def setUp(self):
-		self.curve = make_curve((4, 3), (2, 1), (3, 5))
+		self.curves = (
+			make_curve((3000, 2000), (1000, 4000), (5000, 5000)),
+			make_curve((5000, 5000), (1000, 4000), (3000, 2000)),
+			make_curve((2000, 4000), (6000, 7000), (7000, 2000)),
+			make_curve((7000, 2000), (6000, 7000), (2000, 4000)),
+			make_curve((7000, 7000), (1000, 1000), (3000, 5000)),
+			make_curve((3000, 5000), (1000, 1000), (7000, 7000)),
+			make_curve((1000, 5000), (4000, 1000), (7000, 5000)),
+			make_curve((7000, 5000), (4000, 1000), (1000, 5000)),
+			make_curve((6000, 7000), (1000, 2000), (6000, 4000)),
+			make_curve((6000, 4000), (1000, 2000), (6000, 7000)),
+			make_curve((2000, 2000), (2000, 4000), (2000, 6000)),
+			make_curve((2000, 9000), (5000,    0), (4000, 3000)),
+		)
 
 	def assert_intersections_impl(self, curve1, curve2, correct_points):
 		intersections = curve1.find_intersections(curve2)
@@ -26,22 +40,31 @@ class TestCurves(unittest.TestCase):
 		self.assert_intersections_impl(curve2, curve1, correct_points)
 
 	def test_get_coeff_vectors(self):
-		c, b, a = self.curve.get_coeff_vectors()
+		c, b, a = make_curve((4, 3), (2, 1), (3, 5)).get_coeff_vectors()
+
 		self.assertEqual(a, IntVec(3, 6))
 		self.assertEqual(b, IntVec(-4, -4))
 		self.assertEqual(c, IntVec(4, 3))
 
 	def test_get_x_coeffs(self):
-		c, b, a = self.curve.get_x_coeffs()
+		c, b, a = make_curve((4, 3), (2, 1), (3, 5)).get_x_coeffs()
+
 		self.assertEqual(a, 3)
 		self.assertEqual(b, -4)
 		self.assertEqual(c, 4)
 
 	def test_get_y_coeffs(self):
-		c, b, a = self.curve.get_y_coeffs()
+		c, b, a = make_curve((4, 3), (2, 1), (3, 5)).get_y_coeffs()
+
 		self.assertEqual(a, 6)
 		self.assertEqual(b, -4)
 		self.assertEqual(c, 3)
+
+	def test_eval_xy(self):
+		for curve in self.curves:
+			for i in range(17):
+				t = i / 16
+				self.assertEqual(curve.eval(t), (curve.eval_x(t), curve.eval_y(t)))
 
 	def test_different_axes_no_intersections(self):
 		curve1 = make_curve((4000, 8000), (4500, 5000), (1000, 6000))
@@ -294,3 +317,59 @@ class TestCurves(unittest.TestCase):
 		curve2 = make_curve((3000, 3000), (3000, 3000), (3000, 3000))
 
 		self.assert_intersections(curve1, curve2)
+
+	def test_clip_until(self):
+		for og_curve in self.curves:
+			for i in range(17):
+				t = i / 16
+				clipped_curve = og_curve.clip_until(t)
+
+				self.assertLess(clipped_curve.p0.dist(og_curve.eval(t)), 1.5)
+				self.assertEqual(clipped_curve.p2, og_curve.p2)
+
+				if clipped_curve.p0 == clipped_curve.p2:
+					continue
+
+				angle1 = get_angle_between(og_curve.derivative(t), clipped_curve.derivative(0))
+				angle2 = get_angle_between(og_curve.derivative(1), clipped_curve.derivative(1))
+
+				self.assertLess(degrees(angle1), 1)
+				self.assertLess(degrees(angle2), 1)
+
+	def test_clip_after(self):
+		for og_curve in self.curves:
+			for i in range(17):
+				t = i / 16
+				clipped_curve = og_curve.clip_after(t)
+
+				self.assertLess(clipped_curve.p2.dist(og_curve.eval(t)), 1.5)
+				self.assertEqual(clipped_curve.p0, og_curve.p0)
+
+				if clipped_curve.p0 == clipped_curve.p2:
+					continue
+
+				angle1 = get_angle_between(og_curve.derivative(t), clipped_curve.derivative(1))
+				angle2 = get_angle_between(og_curve.derivative(0), clipped_curve.derivative(0))
+
+				self.assertLess(degrees(angle1), 1)
+				self.assertLess(degrees(angle2), 1)
+
+	def test_clip_after_until(self):
+		for og_curve in self.curves:
+			for i in range(17):
+				for j in range(i, 17):
+					t1 = i / 16
+					t2 = j / 16
+					clipped_curve = og_curve.clip_after_until(t1, t2)
+
+					self.assertLess(clipped_curve.p0.dist(og_curve.eval(t1)), 1.5)
+					self.assertLess(clipped_curve.p2.dist(og_curve.eval(t2)), 1.5)
+
+					if clipped_curve.p0 == clipped_curve.p2:
+						continue
+
+					angle1 = get_angle_between(og_curve.derivative(t1), clipped_curve.derivative(0))
+					angle2 = get_angle_between(og_curve.derivative(t2), clipped_curve.derivative(1))
+
+					self.assertLess(degrees(angle1), 1)
+					self.assertLess(degrees(angle2), 1)

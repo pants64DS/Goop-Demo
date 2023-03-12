@@ -43,46 +43,46 @@ class Vector:
 		return self.scalars.__setitem__(self.convert_scalar(key))
 
 	def __add__(self, other):
-		result = [a + b for a, b in zip(self.scalars, other.scalars)]
+		result = [a + b for a, b in zip(self, other)]
 
 		return get_result_type(self, other)(*result)
 
 	def __sub__(self, other):
-		result = [a - b for a, b in zip(self.scalars, other.scalars)]
+		result = [a - b for a, b in zip(self, other)]
 
 		return get_result_type(self, other)(*result)
 
 	def __mul__(self, scalar):
-		result = [a * scalar for a in self.scalars]
+		result = [a * scalar for a in self]
 
 		return get_result_type(self, scalar)(*result)
 
 	def __rmul__(self, scalar):
-		result = [scalar * a for a in self.scalars]
+		result = [scalar * a for a in self]
 
 		return get_result_type(self, scalar)(*result)
 
 	def __floordiv__(self, scalar):
-		result = [a // scalar for a in self.scalars]
+		result = [a // scalar for a in self]
 
 		return get_result_type(self, scalar)(*result)
 
 	def __truediv__(self, scalar):
-		result = [a / scalar for a in self.scalars]
+		result = [a / scalar for a in self]
 
 		return FloatVec(self, scalar)(*result)
 
 	def __neg__(self):
-		return type(self)(*[-a for a in self.scalars])
+		return type(self)(*[-a for a in self])
 
 	def __eq__(self, other):
-		return all(a == b for a, b in zip(self.scalars, other.scalars))
+		return all(a == b for a, b in zip(self, other))
 
 	def __str__(self):
-		return f"({', '.join([str(x) for x in self.scalars])})"
+		return f"({', '.join([str(x) for x in self])})"
 
 	def length(self):
-		return math.hypot(*self.scalars)
+		return math.hypot(*self)
 
 	def dist(self, other):
 		return (self - other).length()
@@ -106,7 +106,7 @@ class FloatVec(Vector):
 		return float(scalar)
 
 	def __repr__(self):
-		return f"IntVec{self}"
+		return f"FloatVec{self}"
 
 def get_angle_between(u, v):
 	return math.atan2(u.x*v.y - v.x*u.y, u.x*v.x + u.y*v.y)
