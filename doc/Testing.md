@@ -1,5 +1,14 @@
 # Testing
 
+The following things are tested with unit tests:
+* Curve intersections, including all edge cases
+* Curve clipping
+* Loop turning angles
+* Determining if a point is inside a loop (again, including all edge cases)
+* The `Vector` class, to make sure the types are determined properly, among other things
+
+The rest of the program, including the merging of loops, is better tested visually. See the [User Guide](doc/User%20Guide.md) for details.
+
 ## Running tests
 Unit tests can be run by running the command
 ```
@@ -18,4 +27,4 @@ poetry run coverage html
 ```
 in the root directory of this repo. The generated report can be viewed by opening `htmlcov/index.html` in a browser.
 
-![image](https://user-images.githubusercontent.com/39012306/217161892-16962eeb-ceac-4c2b-b941-06250451cbe6.png)
+![image](https://user-images.githubusercontent.com/39012306/224909332-16f1ba44-608b-4b8c-945f-0667fa441ffd.png)
