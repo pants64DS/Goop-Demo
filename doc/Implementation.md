@@ -2,7 +2,15 @@
 
 ## Finding the intersections of quadratic Bézier curves
 
-[todo]
+Because coordinates are stored with limited precision, clipping quadratic Bézier curves can create linear Bézier curves. This implies that it's not enough to be able to calculate intersections between two quadratic Bézier curves, but also between quadratic and linear curves.
+
+When both Bézier curves are quadratic, i.e. segments of parabolas, their intersections are calculated differently depending on whether the axes of the parabolas are parallel or not. When they are not parallel, it's possible to transform them with a linear map so that the axes become perpendicular and aligned with the coordinate axes. Consequently, the x-function of one curve and the y-function of the other curve become first degree polynomials. This makes things a bit simpler, but solving for the intersections still requires solving a quartic equation.
+
+When the curves are segments of parabolas with parallel axes, a linear map can be applied to them so that their axes are parallel with the y-axis, which implies that both of their x-functions are first-degree polynomials. After this, solving for the curve parameters yields either a quadratic or a linear equation.
+
+When one curve is a segment of a parabola and the other one is a line segment, a linear map can be applied to them so that the line segment is vertical. After this, the intersections can be found by solving for $t$ in $x(t) = x_{0}$ where $x$ is the x-function of the quadratic curve and $x_{0}$ is the x-coordinate of every point on the linear curve. The equation is quadratic.
+
+New loops generally don't contain any linear curves, but calculating intersections between two linear curves is implemented as well for the sake of completeness. This corresponds to solving a linear equation.
 
 ## Managing areas delimited by curves
 
