@@ -22,7 +22,7 @@ Once the points of intersection between each curve in the new droplet and each e
 
 The time complexity of this might be something like $O(nm)$, where $m$ is the number of curves in the new droplet and $n$ is the number of curves already on the canvas. However, in any practical application of the algorithm, using 3-5 curves for each new droplet should be sufficient, which effectively brings the complexity down to $O(n)$. This may be reduced further by using a quadtree for the existing curves, but that would be redundant when the algorithm is applied to a 3D game since the game's collision planes would serve the same purpose.
 
-### 3. Converting the painted areas defined by Bézier curves into triangles
+### 3. Converting the painted areas defined by Bézier curves into triangles (not included in this demo)
 The edges of the painted area can be rendered as triangles with a quadratic Bézier curve shaped texture on them. Each triangle at the edge of the beziergon will be defined by the control points of the corresponsing curve. There needs to be two different textures, one for a convex edge and one for a concave edge. The area enclosed by the edge triangles is a polygon that may contain holes. This polygon needs to be triangulated, but the specific algorithm for this will be decided later.
 
 ## Course Details
