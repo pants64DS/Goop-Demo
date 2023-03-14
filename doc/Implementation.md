@@ -1,6 +1,6 @@
 # Implementation
 
-## Finding the intersections of quadratic Bézier curves
+## 1. Finding the intersections of quadratic Bézier curves
 
 Because coordinates are stored with limited precision, clipping quadratic Bézier curves can create linear Bézier curves. This implies that it's not enough to be able to calculate intersections between two quadratic Bézier curves, but also between quadratic and linear curves.
 
@@ -12,7 +12,7 @@ When one curve is a segment of a parabola and the other one is a line segment, a
 
 New loops generally don't contain any linear curves, but calculating intersections between two linear curves is implemented as well for the sake of completeness. This corresponds to solving a linear equation.
 
-## Managing areas delimited by curves
+## 2. Managing areas delimited by curves
 
 Although there are some existing algorithms for merging polygons with each other, I couldn't find any that would fit to the task at hand without significant modifications. Hence, an original algorithm is used instead. We'll start with a few definitions regarding what I'll call *loops*.
 
@@ -68,4 +68,23 @@ $\text{add}\textunderscore\text{loop}(\text{loop system } S, \text{loop } l)$
 9. Let $T' = \text{remove}\textunderscore\text{loop}(T, l) \cup \set{(h, O_h) \mid h \in H}$.
 10. Return $\set{m \in O \mid m\text{ is outside of }l'} \cup \set{(l', T')}$.
 
-This algorithm also relies on the $\text{remove}\textunderscore\text{loop}$ subalgorithm to remove or "cut out" a loop from a loop system. The latter algorithm will be defined later, but it will probably look quite similar. It will certainly have to call $\text{add}\textunderscore\text{loop}$ for inner loop systems, just like $\text{add}\textunderscore\text{loop}$ calls it. This effectively adds recursion to both algorithms, which is unavoidable unless iteration is used instead. However, an iterative algorithm would most likely be significantly more complicated.
+This algorithm also relies on the $\text{remove}\textunderscore\text{loop}$ subalgorithm to remove or "cut out" a loop from a loop system. The latter algorithm is partially defined in the code, with the limitation that it only allows cutting with loops that don't intersect with any top-level loops in the loop system.
+
+## 3. Determining if a loop is inside another when no intersections are found
+
+The above algorithm needs to be able to find out if a loop is inside another, even when they don't intersect. This is achieved by picking an arbitrary point on one loop, and checking if it's inside the other loop. This is in turn achieved by drawing a vertical ray starting from that point, and counting how many times it intersects the loop. If the number of intersections is even, the point is outside of the loop, and otherwise it's inside of the loop. Tangential points are not counted as intersection points.
+
+The intersection points between the ray and each curve are actually calculated only when the starting point of the ray is inside the bounding box of the curve's control points. In other cases, it's basically sufficient to check whether the ray is between the starting and ending points of the curve, or if the curve is above the whole ray. However, since the ray can also pass through control points, which could normally lead to intersections getting counted twice, some tricks are used to get the right parity in all cases, making things somewhat more complicated.
+
+## 4. Merging loops with each other
+Loops are merged with each other with the `Loop.merge_to` function, which meets the requirements for $merge_to$ defined above. To put it simply, it finds all intersections between the new loop and the previous loops and forms a directed graph of them so that there's an edge from each intersection to the next intersection on the same loop ("next" meaning the one with the following parameter value).
+
+It's also important to know which loop is "outer" and which one is "inner" after each intersection, so that the algorithm can trace the loop that bounds all input loops. This is determined by taking the determinant of a matrix made of the derivative vectors of both loops at the given intersection, which is equivalent to rotating one vector 90° and then calculating the dot product.
+
+First, an arbitrary intersection is chosen, and a path is traced by following the "outer" loop at each intersection. If nothing weird happens because of numerical inaccuracies, the starting intersection is eventually reached. Once this happens, the parts of the traced loop are clipped out of the input loops and turned into a new loop that's added to a list of result loops. After this, a new intersection (that hasn't been marked as visited) is chosen and the process is repeated until no intersections are left.
+
+At this point, all resulting loops are in a list with no particular order. However, we know that one of the loops contains all others, and the algorithm is required to return this loop separately from them. We could use the algorithm that checks whether a point is inside a loop, but to avoid dealing with edge cases I decided to use a different approach and determine which loops clockwise and which ones are not. The loop with the same turning number as the input loops is the outer one, and the other ones must be inside it. The turning number of a loop is determined by calculating the sum of exterior angles of a polygon consisting of its control points.
+
+## 5. Clipping loops and curves
+
+The process described above requires being able to clip a part of a loop between intersection points, which in turn requires being able to clip individual loops between parameter values. When clipping either a quadratic or a linear Bézier curve, the new start and end points can be found by simply evaluating the curve with the given parameters. If the curve is quadratic, it's also necessary to find the third control point. This can be done by drawing tangent lines to the curve at the points corresponding to the parameter values, and finding their intersection point. When clipping a part of a whole loop between two parameter values, the start is clipped from the first curve, the end is clipped of the last curve, and any curves between the two are copied.
