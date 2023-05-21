@@ -1,7 +1,7 @@
 from math import degrees
 import unittest
 from util import IntVec
-from geometry import Loop
+from float_geometry import Loop
 
 class TestLoop(unittest.TestCase):
 	def setUp(self):

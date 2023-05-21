@@ -1,7 +1,7 @@
 from math import sqrt, isfinite
 import numpy
 import pyray
-from geometry import LinearCurve, find_line_intersection, BoundingBox, CurveIntersection
+from float_geometry import LinearCurve, find_line_intersection, BoundingBox, CurveIntersection
 from util import IntVec
 
 # Returns true when (-b - sqrt(bb - 4ac)) / (2a) >= 0

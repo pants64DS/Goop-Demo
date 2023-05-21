@@ -1,9 +1,9 @@
 import pyray
 import ui
-from geometry import make_curve, LinearCurve
+from float_geometry import make_curve, LinearCurve
 from util import IntVec
 
-class CurveView:
+class FloatCurveView:
 	def __init__(self):
 		self.buttons = ui.ButtonSystem(
 			ui.Button(256, 56),

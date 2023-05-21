@@ -1,6 +1,6 @@
 import pyray
 from util import IntVec
-from geometry.curve_helpers import BoundingBox, CurveIntersection
+from float_geometry.curve_helpers import BoundingBox, CurveIntersection
 
 class LinearCurve:
 	def __init__(self, p0, p2):

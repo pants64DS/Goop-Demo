@@ -2,9 +2,9 @@ from math import sin, cos, pi, degrees
 import pyray
 import ui
 from util import IntVec
-from geometry import Loop
+from float_geometry import Loop
 
-class LoopView:
+class FloatLoopView:
 	def __init__(self):
 		mid = IntVec(ui.screen_width, ui.screen_height) // 2
 		points = [mid + IntVec(300, 0)]

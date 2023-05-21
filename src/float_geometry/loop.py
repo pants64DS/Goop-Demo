@@ -2,7 +2,7 @@ from math import floor, ceil
 import pyray
 from numpy import sign
 from util import IntVec, get_angle_between
-from geometry import make_curve
+from float_geometry import make_curve
 
 def next_cyclic_element(l, i):
 	i += 1

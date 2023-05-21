@@ -5,19 +5,19 @@ if __name__ == "__main__":
 	pyray.init_window(ui.screen_width, ui.screen_height, "Goop Demo")
 	pyray.enable_event_waiting()
 
-	curve_view = ui.CurveView()
-	loop_view = ui.LoopView()
+	float_curve_view = ui.FloatCurveView()
+	float_loop_view = ui.FloatLoopView()
 
-	curr_view = loop_view
+	curr_view = float_loop_view
 	while not pyray.window_should_close():
 		if pyray.is_key_pressed(pyray.KEY_ONE):
-			curr_view = curve_view
+			curr_view = float_curve_view
 
 		if pyray.is_key_pressed(pyray.KEY_TWO):
-			curr_view = loop_view
+			curr_view = float_loop_view
 
-		if pyray.is_key_pressed(pyray.KEY_THREE) and curr_view is loop_view:
-			curr_view = ui.CellView(loop_view.loop)
+		if pyray.is_key_pressed(pyray.KEY_THREE) and curr_view is float_loop_view:
+			curr_view = ui.FloatCellView(float_loop_view.loop)
 
 		curr_view.update()
 		pyray.begin_drawing()

@@ -2,9 +2,9 @@ from math import sin, cos, pi, degrees
 import pyray
 import ui
 from util import IntVec
-from geometry import Loop, Cell, LoopSystem
+from float_geometry import Loop, Cell, LoopSystem
 
-class CellView:
+class FloatCellView:
 	def __init__(self, loop):
 		self.loop_system = LoopSystem(Cell(loop))
 		self.new_radius = 100

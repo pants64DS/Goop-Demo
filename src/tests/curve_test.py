@@ -1,6 +1,6 @@
 from math import degrees
 import unittest
-from geometry import make_curve
+from float_geometry import make_curve
 from util import IntVec, get_angle_between
 
 class TestCurves(unittest.TestCase):
