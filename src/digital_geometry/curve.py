@@ -19,6 +19,42 @@ class Curve:
 
 		return (a * x - b * y)**2 < (2 * (d * y - c * x) - e) * e
 
+	def inner_curve_contains(self, v):
+		p0 = self.p0 - self.p1
+		p2 = self.p2 - self.p1
+		x, y = IntVec(v) - self.p1
+
+		# Flip the axis of the parabola to the first quadrant
+		if p0.x < -p2.x:
+			p0.x = -p0.x
+			p2.x = -p2.x
+			x = -x
+
+		if p0.y < -p2.y:
+			p0.y = -p0.y
+			p2.y = -p2.y
+			y = -y
+
+		a = p0.y + p2.y
+		b = p0.x + p2.x
+		c = p0.y - p2.y
+		d = p0.x - p2.x
+		e = p0.x * p2.y - p2.x * p0.y
+
+		if (a * x - b * y)**2 >= (2 * (d * y - c * x) - e) * e:
+			return False
+
+		x -= 1
+		y += 1
+		if (a * x - b * y)**2 < (2 * (d * y - c * x) - e) * e:
+			y -= 2
+			if (a * x - b * y)**2 < (2 * (d * y - c * x) - e) * e:
+				x += 2
+				if (a * x - b * y)**2 < (2 * (d * y - c * x) - e) * e:
+					return False
+
+		return True
+
 	def __contains__(self, v):
 		p0 = self.p0 - self.p1
 		p2 = self.p2 - self.p1

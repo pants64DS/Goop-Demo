@@ -8,7 +8,7 @@ class PixelView:
 		self.half_grid_size = 8
 		button_grid_coords = ((-6, 10), (-17, -10), (12, -5))
 
-		self.buttons = ui.ButtonSystem(*[ui.Button(*self.to_screen_coords(pos), pyray.GREEN) for pos in button_grid_coords])
+		self.buttons = ui.ButtonSystem(*[ui.Button(*self.to_screen_coords(pos), pyray.BLUE) for pos in button_grid_coords])
 
 	def to_screen_coords(self, v):
 		screen_x = ui.center_x + 2 * v[0] * self.half_grid_size
@@ -66,6 +66,9 @@ class PixelView:
 			for y in range(min_y, 1 - min_y):
 				if (x, y) in self.curve:
 					self.draw_pixel((x, y), pyray.YELLOW)
+
+				if self.curve.inner_curve_contains((x, y)):
+					self.draw_pixel((x, y), pyray.ORANGE)
 
 		pyray.draw_line(ui.center_x, 0, ui.center_x, ui.screen_height, pyray.RED)
 		pyray.draw_line(0, ui.center_y, ui.screen_width, ui.center_y, pyray.RED)
