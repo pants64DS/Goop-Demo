@@ -6,6 +6,8 @@ main_color = pyray.Color(156, 158, 232, 255)
 fill_color = pyray.Color(110, 110, 180, 255)
 screen_width = 1280
 screen_height = 720
+center_x = screen_width >> 1
+center_y = screen_height >> 1
 
 def draw_area(curves):
 	line_gap = 14
