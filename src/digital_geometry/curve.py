@@ -1,112 +1,116 @@
 from util import IntVec
 
+class CurvePointCollision:
+	def __init__(self, curve, point):
+		self.p0 = curve.p0 - curve.p1
+		self.p2 = curve.p2 - curve.p1
+		self.point = IntVec(point) - curve.p1
+
+		# if self.p0.x == -self.p2.x or self.p0.y == -self.p2.y:
+		# 	return False
+			# raise NotImplementedError("Coordinate-aligned parabolas")
+
+		# Flip the axis of the parabola to the first quadrant
+		if self.p0.x < -self.p2.x:
+			self.p0.x = -self.p0.x
+			self.p2.x = -self.p2.x
+			self.point.x = -self.point.x
+
+		if self.p0.y < -self.p2.y:
+			self.p0.y = -self.p0.y
+			self.p2.y = -self.p2.y
+			self.point.y = -self.point.y
+
+		self.a = self.p0.y + self.p2.y
+		self.b = self.p0.x + self.p2.x
+		self.c = self.p0.y - self.p2.y
+		self.d = self.p0.x - self.p2.x
+		self.e = self.p0.x * self.p2.y - self.p2.x * self.p0.y
+
+	def _parabola_encloses(self, x, y):
+		f = self.a * x - self.b * y
+
+		return f * f < (2 * (self.d * y - self.c * x) - self.e) * self.e
+
+	def middle_edge_encloses_point(self):
+		return self._parabola_encloses(*self.point)
+
+	def inner_edge_encloses_point(self, edge_dist):
+		x = self.point.x - edge_dist
+		y = self.point.y + edge_dist
+
+		if self._parabola_encloses(x, y):
+			y -= edge_dist * 2
+			if self._parabola_encloses(x, y):
+				x += edge_dist * 2
+				if self._parabola_encloses(x, y):
+					return True
+
+		return False
+
+	def outer_edge_encloses_point(self, edge_dist):
+		# Min x and min y
+		x = self.point.x + edge_dist
+		y = self.point.y + edge_dist
+
+		if self.b * x <= self.p0.x * self.p2.x or self.a * y <= self.p0.y * self.p2.y:
+			return False
+
+		# Top left parabola
+		y -= edge_dist * 2
+
+		f = self.b * y - self.a * x
+		if self.b * f >= self.d * self.e and not self._parabola_encloses(x, y):
+			return False
+
+		# Bottom right parabola
+		x -= edge_dist * 2
+		y += edge_dist * 2
+
+		f = self.b * y - self.a * x
+		if self.a * f <= self.c * self.e and not self._parabola_encloses(x, y):
+			return False
+
+		# Bottom left parabola
+		x += edge_dist * 2
+
+		if self.a * x + self.b * y <= self.p0.x * self.p2.y + self.p2.x * self.p0.y \
+		and not self._parabola_encloses(x, y):
+			return False
+
+		return True
+
+	def edge_encloses_point(self, edge_id):
+		if edge_id < 0:
+			return self.inner_edge_encloses_point(-edge_id)
+
+		if edge_id > 0:
+			return self.outer_edge_encloses_point(edge_id)
+
+		return self.middle_edge_encloses_point()
+
 class Curve:
 	def __init__(self, p0, p1, p2):
 		self.p0 = IntVec(p0)
 		self.p1 = IntVec(p1)
 		self.p2 = IntVec(p2)
 
-	def is_in_bounded_area(self, v):
-		p0 = self.p0 - self.p1
-		p2 = self.p2 - self.p1
-		x, y = v - self.p1
+	def inner_curve_contains(self, point):
+		clsn = CurvePointCollision(self, point)
 
-		a = p0.y + p2.y
-		b = p0.x + p2.x
-		c = p0.y - p2.y
-		d = p0.x - p2.x
-		e = p0.x * p2.y - p2.x * p0.y
+		return clsn.middle_edge_encloses_point() and not clsn.inner_edge_encloses_point(1)
 
-		return (a * x - b * y)**2 < (2 * (d * y - c * x) - e) * e
+	def __contains__(self, point):
+		clsn = CurvePointCollision(self, point)
 
-	def inner_curve_contains(self, v):
-		p0 = self.p0 - self.p1
-		p2 = self.p2 - self.p1
-		x, y = IntVec(v) - self.p1
+		return clsn.outer_edge_encloses_point(1) and not clsn.middle_edge_encloses_point()
 
-		# Flip the axis of the parabola to the first quadrant
-		if p0.x < -p2.x:
-			p0.x = -p0.x
-			p2.x = -p2.x
-			x = -x
+	def outer_curve_contains(self, point):
+		clsn = CurvePointCollision(self, point)
 
-		if p0.y < -p2.y:
-			p0.y = -p0.y
-			p2.y = -p2.y
-			y = -y
+		return clsn.outer_edge_encloses_point(2) and not clsn.outer_edge_encloses_point(1)
 
-		a = p0.y + p2.y
-		b = p0.x + p2.x
-		c = p0.y - p2.y
-		d = p0.x - p2.x
-		e = p0.x * p2.y - p2.x * p0.y
+	def curve_contains(self, point, curve_id):
+		clsn = CurvePointCollision(self, point)
 
-		if (a * x - b * y)**2 >= (2 * (d * y - c * x) - e) * e:
-			return False
-
-		x -= 1
-		y += 1
-		if (a * x - b * y)**2 < (2 * (d * y - c * x) - e) * e:
-			y -= 2
-			if (a * x - b * y)**2 < (2 * (d * y - c * x) - e) * e:
-				x += 2
-				if (a * x - b * y)**2 < (2 * (d * y - c * x) - e) * e:
-					return False
-
-		return True
-
-	def __contains__(self, v):
-		p0 = self.p0 - self.p1
-		p2 = self.p2 - self.p1
-		x, y = IntVec(v) - self.p1
-
-		# if p0.x == -p2.x or p0.y == -p2.y:
-		# 	return False
-			# raise NotImplementedError("Coordinate-aligned parabolas")
-
-		# Flip the axis of the parabola to the first quadrant
-		if p0.x < -p2.x:
-			p0.x = -p0.x
-			p2.x = -p2.x
-			x = -x
-
-		if p0.y < -p2.y:
-			p0.y = -p0.y
-			p2.y = -p2.y
-			y = -y
-
-		a = p0.y + p2.y
-		b = p0.x + p2.x
-		c = p0.y - p2.y
-		d = p0.x - p2.x
-		e = p0.x * p2.y - p2.x * p0.y
-
-		if b * (x + 1) <= p0.x * p2.x or a * (y + 1) <= p0.y * p2.y:
-			return False
-
-		if (a * x - b * y)**2 < (2 * (d * y - c * x) - e) * e:
-			return False
-
-		x += 1
-		y -= 1
-
-		f = b * y - a * x
-		if b * f >= d * e:
-			if f * f >= (2 * (d * y - c * x) - e) * e:
-				return False
-
-		x -= 2
-		y += 2
-
-		f = b * y - a * x
-		if a * f <= c * e:
-			if f * f >= (2 * (d * y - c * x) - e) * e:
-				return False
-
-		x += 2
-
-		if a * x + b * y <= p0.x * p2.y + p2.x * p0.y:
-			if (b * y - a * x)**2 >= (2 * (d * y - c * x) - e) * e:
-				return False
-
-		return True
+		return clsn.edge_encloses_point(curve_id + 1) and not clsn.edge_encloses_point(curve_id)

@@ -1,1 +1,1 @@
-from digital_geometry.curve import Curve
+from digital_geometry.curve import Curve, CurvePointCollision

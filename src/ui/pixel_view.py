@@ -64,11 +64,21 @@ class PixelView:
 
 		for x in range(min_x, 1 - min_x):
 			for y in range(min_y, 1 - min_y):
+				i = 0
+
 				if (x, y) in self.curve:
 					self.draw_pixel((x, y), pyray.YELLOW)
+					i += 1
 
 				if self.curve.inner_curve_contains((x, y)):
 					self.draw_pixel((x, y), pyray.ORANGE)
+					i += 1
+
+				if self.curve.outer_curve_contains((x, y)):
+					self.draw_pixel((x, y), pyray.GREEN)
+					i += 1
+
+				assert(i in (0, 1))
 
 		pyray.draw_line(ui.center_x, 0, ui.center_x, ui.screen_height, pyray.RED)
 		pyray.draw_line(0, ui.center_y, ui.screen_width, ui.center_y, pyray.RED)
