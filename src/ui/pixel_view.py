@@ -70,8 +70,8 @@ class PixelView:
 		min_x = (ui.screen_width  - 2 * self.half_grid_size) // (-4 * self.half_grid_size)
 		min_y = (ui.screen_height - 2 * self.half_grid_size) // (-4 * self.half_grid_size)
 
+		"""
 		pixels = []
-
 		for x in range(min_x, 1 - min_x):
 			for y in range(min_y, 1 - min_y):
 				i = 0
@@ -88,9 +88,15 @@ class PixelView:
 					self.draw_pixel((x, y), pyray.GREEN)
 					i += 1
 
-				assert(i in (0, 1))
+				assert i in (0, 1)
 
 		sort(pixels, self.curve.comes_before)
+		"""
+
+		try:
+			pixels = [point for point in self.curve]
+		except:
+			pixels = []
 
 		for i, pixel in enumerate(pixels):
 			self.draw_pixel(pixel, pyray.Color(255, (i << 8) // len(pixels), 0, 255))

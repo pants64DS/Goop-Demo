@@ -122,7 +122,7 @@ class Curve:
 	def __contains__(self, point):
 		return self.extended_curve_contains(point) \
 			and not self.comes_before(point, self.p0) \
-			and self.comes_before(point, self.p2)
+			and not self.comes_before(self.p2, point)
 
 	def outer_curve_contains(self, point):
 		clsn = CurvePointCollision(self, point)
@@ -157,3 +157,32 @@ class Curve:
 				return clsn1.point.y - clsn2.point.y
 			else:
 				return clsn2.point.y - clsn1.point.y
+
+	def get_next_point(self, point):
+		res = None
+
+		for i in range(4):
+			j = i >> 1 & 1
+			offset = IntVec(j - (i & 1), j - (~i & 1))
+			adjacent_point = point + offset
+
+			if self.extended_curve_contains(adjacent_point) \
+			and self.comes_before(point, adjacent_point) \
+			and (res is None or not self.comes_before(res, adjacent_point)):
+				res = adjacent_point
+
+		return res
+
+	def __iter__(self):
+		point = self.p0
+
+		while True:
+			yield point
+
+			if point == self.p2:
+				break
+
+			point = self.get_next_point(point)
+
+			# The next point might not exist if the curve is degenerate
+			if point is None: raise Exception("The next point on the curve doesn't exist")
