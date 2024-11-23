@@ -27,65 +27,44 @@ class CurvePointCollision:
 		self.d = self.p0.x - self.p2.x
 		self.e = self.p0.x * self.p2.y - self.p2.x * self.p0.y
 
-	def _parabola_encloses(self, x, y):
-		f = self.a * x - self.b * y
+	def _parabola_encloses(self, offset_times_two):
+		x, y = 2 * self.point + offset_times_two
 
-		return f * f < (2 * (self.d * y - self.c * x) - self.e) * self.e
+		return (self.a * x - self.b * y)**2 \
+		< (2 * (self.d * y - self.c * x) - 2 * self.e) * 2 * self.e
 
-	def middle_edge_encloses_point(self):
-		return self._parabola_encloses(*self.point)
+	def inner_edge_encloses_point(self):
+		return self._parabola_encloses(IntVec(-1, 1)) \
+		and    self._parabola_encloses(IntVec(-1, -1)) \
+		and    self._parabola_encloses(IntVec(1, -1))
 
-	def inner_edge_encloses_point(self, edge_dist):
-		x = self.point.x - edge_dist
-		y = self.point.y + edge_dist
-
-		if self._parabola_encloses(x, y):
-			y -= edge_dist * 2
-			if self._parabola_encloses(x, y):
-				x += edge_dist * 2
-				if self._parabola_encloses(x, y):
-					return True
-
-		return False
-
-	def outer_edge_encloses_point(self, edge_dist):
+	def outer_edge_encloses_point(self, edge_dist=1):
 		# Min x and min y
-		x = self.point.x + edge_dist
-		y = self.point.y + edge_dist
-
-		if self.b * x <= self.p0.x * self.p2.x or self.a * y <= self.p0.y * self.p2.y:
+		if self.b * (2 * self.point.x + edge_dist) <= 2 * self.p0.x * self.p2.x \
+		or self.a * (2 * self.point.y + edge_dist) <= 2 * self.p0.y * self.p2.y:
 			return False
 
 		# Top left parabola
-		y -= edge_dist * 2
+		y = self.point.y - edge_dist
 
-		if self.b * (self.b * y - self.a * x) >= self.d * self.e and not self._parabola_encloses(x, y):
+		if self.b * (self.b * (2 * self.point.y - edge_dist) - self.a * (2 * self.point.x + edge_dist)) \
+		>= 2 * self.d * self.e \
+		and not self._parabola_encloses(IntVec(1, -1)):
 			return False
 
 		# Bottom right parabola
-		x -= edge_dist * 2
-		y += edge_dist * 2
-
-		if self.a * (self.b * y - self.a * x) <= self.c * self.e and not self._parabola_encloses(x, y):
+		if self.a * (self.b * (2 * self.point.y + edge_dist) - self.a * (2 * self.point.x - edge_dist)) \
+		<= 2 * self.c * self.e \
+		and not self._parabola_encloses(IntVec(-1, 1)):
 			return False
 
 		# Bottom left parabola
-		x += edge_dist * 2
-
-		if self.a * x + self.b * y <= self.p0.x * self.p2.y + self.p2.x * self.p0.y \
-		and not self._parabola_encloses(x, y):
+		if self.a * (2 * self.point.x + edge_dist) + self.b * (2 * self.point.y + edge_dist) \
+		<= 2 * (self.p0.x * self.p2.y + self.p2.x * self.p0.y) \
+		and not self._parabola_encloses(IntVec(1, 1)):
 			return False
 
 		return True
-
-	def edge_encloses_point(self, edge_id):
-		if edge_id < 0:
-			return self.inner_edge_encloses_point(-edge_id)
-
-		if edge_id > 0:
-			return self.outer_edge_encloses_point(edge_id)
-
-		return self.middle_edge_encloses_point()
 
 	def get_region_id(self):
 		x, y = self.point
@@ -109,30 +88,19 @@ class Curve:
 
 		self.order = self.get_order(self.p0, self.p2)
 
-	def inner_curve_contains(self, point):
-		clsn = CurvePointCollision(self, point)
-
-		return clsn.middle_edge_encloses_point() and not clsn.inner_edge_encloses_point(1)
-
 	def extended_curve_contains(self, point):
 		clsn = CurvePointCollision(self, point)
 
-		return clsn.outer_edge_encloses_point(1) and not clsn.middle_edge_encloses_point()
+		return clsn.outer_edge_encloses_point() and not clsn.inner_edge_encloses_point()
 
 	def __contains__(self, point):
+		return self.extended_curve_contains(point)
+
+		"""
 		return self.extended_curve_contains(point) \
 			and not self.comes_before(point, self.p0) \
 			and not self.comes_before(self.p2, point)
-
-	def outer_curve_contains(self, point):
-		clsn = CurvePointCollision(self, point)
-
-		return clsn.outer_edge_encloses_point(2) and not clsn.outer_edge_encloses_point(1)
-
-	def adjacent_curve_contains(self, point, curve_id):
-		clsn = CurvePointCollision(self, point)
-
-		return clsn.edge_encloses_point(curve_id + 1) and not clsn.edge_encloses_point(curve_id)
+		"""
 
 	def comes_before(self, point1, point2):
 		return self.order * self.get_order(point1, point2) > 0
@@ -173,9 +141,33 @@ class Curve:
 
 		return res
 
-	def __iter__(self):
-		point = self.p0
+	def in_bounding_box(self, point):
+		min_x, _, max_x = sorted([self.p0.x, self.p1.x, self.p2.x])
+		min_y, _, max_y = sorted([self.p0.y, self.p1.y, self.p2.y])
 
+		return min_x <= point.x <= max_x and min_y <= point.y <= max_y
+
+	def search(self, point, visited):
+		if point in visited: return
+		visited.add(point)
+
+		if point not in self or not self.in_bounding_box(point): return
+		yield point
+
+		yield from self.search(IntVec(point.x + 1, point.y), visited)
+		yield from self.search(IntVec(point.x - 1, point.y), visited)
+		yield from self.search(IntVec(point.x, point.y + 1), visited)
+		yield from self.search(IntVec(point.x, point.y - 1), visited)
+
+		return visited
+
+	def __iter__(self):
+		try:
+			yield from self.search(self.p0, set())
+		except Exception as e:
+			print(f"ERROR!!!!!!: {e}")
+
+		"""
 		while True:
 			yield point
 
@@ -186,3 +178,4 @@ class Curve:
 
 			# The next point might not exist if the curve is degenerate
 			if point is None: raise Exception("The next point on the curve doesn't exist")
+		"""

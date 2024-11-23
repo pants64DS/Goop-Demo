@@ -87,6 +87,9 @@ class Vector:
 	def __repr__(self):
 		return type(self).__name__ + str(self)
 
+	def __hash__(self):
+		return hash(tuple(self.scalars))
+
 	def length(self):
 		return math.hypot(*self)
 
