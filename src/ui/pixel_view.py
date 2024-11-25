@@ -8,9 +8,9 @@ class PixelView:
 		self.half_grid_size = 8
 
 		self.buttons = ui.ButtonSystem(
-			ui.Button(*self.to_screen_coords(( -6,  18)), pyray.RED),
-			ui.Button(*self.to_screen_coords((-35, -20)), pyray.GREEN),
-			ui.Button(*self.to_screen_coords(( 35,  10)), pyray.BLUE)
+			ui.Button(*self.to_screen_coords(( -6,  18)), pyray.Color(255, 255, 0, 255)),
+			ui.Button(*self.to_screen_coords((-35, -20)), pyray.Color(255, 255, 0, 255)),
+			ui.Button(*self.to_screen_coords(( 35,  10)), pyray.Color(255, 255, 0, 255))
 		)
 
 	def to_screen_coords(self, v):
@@ -67,32 +67,6 @@ class PixelView:
 			pyray.draw_line(0, y2, ui.screen_width, y2, ui.main_color)
 			y -= 2 * self.half_grid_size
 
-		min_x = (ui.screen_width  - 2 * self.half_grid_size) // (-4 * self.half_grid_size)
-		min_y = (ui.screen_height - 2 * self.half_grid_size) // (-4 * self.half_grid_size)
-
-		"""
-		pixels = []
-		for x in range(min_x, 1 - min_x):
-			for y in range(min_y, 1 - min_y):
-				i = 0
-
-				if (x, y) in self.curve:
-					pixels.append(IntVec(x, y))
-					i += 1
-
-				if self.curve.inner_curve_contains((x, y)):
-					self.draw_pixel((x, y), pyray.BLUE)
-					i += 1
-
-				if self.curve.outer_curve_contains((x, y)):
-					self.draw_pixel((x, y), pyray.GREEN)
-					i += 1
-
-				assert i in (0, 1)
-
-		sort(pixels, self.curve.comes_before)
-		"""
-
 		try:
 			pixels = [point for point in self.curve]
 		except Exception as e:
@@ -100,9 +74,9 @@ class PixelView:
 			pixels = []
 
 		for i, pixel in enumerate(pixels):
-			# self.draw_pixel(pixel, pyray.Color(255, (i << 8) // len(pixels), 0, 255))
-			self.draw_pixel(pixel, pyray.Color(255, 255, 0, 255))
-			# self.draw_number(pixel, i)
+			self.draw_pixel(pixel, pyray.Color(255, 0, 0, 255))
+
+		self.draw_continous_curve(self.curve, pyray.Color(255, 255, 0, 255))
 
 		p0 = self.curve.p0 - self.curve.p1
 		p2 = self.curve.p2 - self.curve.p1

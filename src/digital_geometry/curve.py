@@ -6,25 +6,25 @@ def parabola_encloses(a, b, c, d, e, u, offset_times_two):
 
 	return f * f < (2 * (d * y - c * x) - 2 * e) * 2 * e
 
-def point_before_control_point(u, p, u_in_P0, u_in_P1, u_in_P2):
-	# If p is in the first quadrant
-	if p.x >= 0 and p.y >= 0:
+def point_before_endpoint(u, p0, u_in_P0, u_in_P1, u_in_P2):
+	# If p0 is in the first quadrant
+	if p0.x >= 0 and p0.y >= 0:
 		return (
 			u_in_P0 and not u_in_P1
-			and (u.y > p.y or (u.y == p.y and u.x > p.x))
+			and (u.y > p0.y or (u.y == p0.y and u.x > p0.x))
 		)
 
-	# If p is in the third quadrant
-	if p.x <= 0 and p.y <= 0:
+	# If p0 is in the third quadrant
+	if p0.x <= 0 and p0.y <= 0:
 		return (
 			(u_in_P0 and not u_in_P1)
-			or u.x < p.x or (u.x == p.x and u.y < p.y)
+			or u.x < p0.x or (u.x == p0.x and u.y < p0.y)
 		)
 
-	# If p is in the second quadrant
+	# If p0 is in the second quadrant
 	return (
-		(u_in_P0 and (u_in_P2 or u.y > p.y))
-		or u.x < p.x or (u.x == p.x and u.y > p.y)
+		(u_in_P0 and (u_in_P2 or u.y > p0.y))
+		or u.x < p0.x or (u.x == p0.x and u.y > p0.y)
 	)
 
 def point_in_discrete_curve(u, p0, p1, p2):
@@ -81,10 +81,10 @@ def point_in_discrete_curve(u, p0, p1, p2):
 		return False
 
 	# Check if point u is between the endpoints
-	if point_before_control_point(u, p0, u_in_P0, u_in_P1, u_in_P2):
+	if point_before_endpoint(u, p0, u_in_P0, u_in_P1, u_in_P2):
 		return False
 
-	if point_before_control_point(IntVec(u.y, u.x), IntVec(p2.y, p2.x), u_in_P1, u_in_P0, u_in_P2):
+	if point_before_endpoint(IntVec(u.y, u.x), IntVec(p2.y, p2.x), u_in_P1, u_in_P0, u_in_P2):
 		return False
 
 	return u.x <= max(p0.x, p2.x) and u.y <= max(p0.y, p2.y)
