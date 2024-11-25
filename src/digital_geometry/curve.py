@@ -32,10 +32,6 @@ def point_in_discrete_curve(u, p0, p1, p2):
 	p2 -= p1
 	u  -= p1
 
-	# if p0.x == -p2.x or p0.y == -p2.y:
-	# 	return False
-		# raise NotImplementedError("Coordinate-aligned parabolas")
-
 	# Flip the axis of the parabola to the first quadrant
 	if p0.x < -p2.x:
 		p0.x = -p0.x
@@ -93,6 +89,22 @@ def point_in_discrete_curve(u, p0, p1, p2):
 
 	return u.x <= max(p0.x, p2.x) and u.y <= max(p0.y, p2.y)
 
+def dfs_in_discrete_curve(u, p0, p1, p2, visited):
+	if u in visited: return
+	visited.add(u)
+
+	if not point_in_discrete_curve(u, p0, p1, p2):
+		return
+
+	yield u
+
+	yield from dfs_in_discrete_curve(IntVec(u.x + 1, u.y), p0, p1, p2, visited)
+	yield from dfs_in_discrete_curve(IntVec(u.x - 1, u.y), p0, p1, p2, visited)
+	yield from dfs_in_discrete_curve(IntVec(u.x, u.y + 1), p0, p1, p2, visited)
+	yield from dfs_in_discrete_curve(IntVec(u.x, u.y - 1), p0, p1, p2, visited)
+
+	return visited
+
 class Curve:
 	def __init__(self, p0, p1, p2):
 		self.p0 = IntVec(p0)
@@ -102,23 +114,5 @@ class Curve:
 	def __contains__(self, point):
 		return point_in_discrete_curve(IntVec(point), self.p0, self.p1, self.p2)
 
-	def search(self, point, visited):
-		if point in visited: return
-		visited.add(point)
-
-		if point not in self or abs(point.x) > 50 or abs(point.y) > 50:
-			return
-		yield point
-
-		yield from self.search(IntVec(point.x + 1, point.y), visited)
-		yield from self.search(IntVec(point.x - 1, point.y), visited)
-		yield from self.search(IntVec(point.x, point.y + 1), visited)
-		yield from self.search(IntVec(point.x, point.y - 1), visited)
-
-		return visited
-
 	def __iter__(self):
-		try:
-			yield from self.search(self.p0, set())
-		except Exception as e:
-			print(f"ERROR!!!!!!: {e}")
+		yield from dfs_in_discrete_curve(self.p0, self.p0, self.p1, self.p2, set())

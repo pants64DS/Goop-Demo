@@ -95,12 +95,14 @@ class PixelView:
 
 		try:
 			pixels = [point for point in self.curve]
-		except:
+		except Exception as e:
+			print(f"ERROR!!!!!!: {e}")
 			pixels = []
 
 		for i, pixel in enumerate(pixels):
-			self.draw_pixel(pixel, pyray.Color(255, (i << 8) // len(pixels), 0, 255))
-			self.draw_number(pixel, i)
+			# self.draw_pixel(pixel, pyray.Color(255, (i << 8) // len(pixels), 0, 255))
+			self.draw_pixel(pixel, pyray.Color(255, 255, 0, 255))
+			# self.draw_number(pixel, i)
 
 		p0 = self.curve.p0 - self.curve.p1
 		p2 = self.curve.p2 - self.curve.p1
