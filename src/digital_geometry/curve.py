@@ -108,68 +108,34 @@ def root_is_less_than(a1, b1, d1, s1, a2, b2, d2, s2):
 def root_intervals_overlap(start1, end1, start2, end2):
 	return not (root_is_less_than(*end2, *start1) or root_is_less_than(*end1, *start2))
 
-def point_in_discrete_curve_2(u, p0, p1, p2):
-	p0 = p0 - u
-	p1 = p1 - u
-	p2 = p2 - u
+def get_strip_intervals(a, b, c):
+	if a < 0: a, b, c = -a, -b, -c
 
+	d1 = b*b - 4*a*(c - 1)
+	if d1 < 0: return []
+
+	d2 = b*b - 4*a*(c + 1)
+
+	outer_left  = a, b, d1, -1
+	inner_left  = a, b, d2, -1
+	outer_right = a, b, d1, +1
+	inner_right = a, b, d2, +1
+
+	if d2 <= 0: return [(outer_left, outer_right)]
+
+	return [(outer_left,  inner_left), (inner_right, outer_right)]
+
+def point_in_discrete_curve_2(u, p0, p1, p2):
 	a1, a2 = 2*(p0 + p2 - 2*p1)
 	b1, b2 = 4*(p1 - p0)
-	c1, c2 = 2*(p0)
+	c1, c2 = 2*(p0 - u)
 
-	if a1 < 0: a1, b1, c1 = -a1, -b1, -c1
-	if a2 < 0: a2, b2, c2 = -a2, -b2, -c2
+	for i1 in get_strip_intervals(a1, b1, c1):
+		for i2 in get_strip_intervals(a2, b2, c2):
+			if root_intervals_overlap(*i1, *i2):
+				return True
 
-	d1 = b1*b1 - 4*a1*(c1 - 1)
-	if d1 < 0: return False
-
-	d2 = b2*b2 - 4*a2*(c2 - 1)
-	if d2 < 0: return False
-
-	D1 = b1*b1 - 4*a1*(c1 + 1)
-	D2 = b2*b2 - 4*a2*(c2 + 1)
-
-	outer_left_f1  = a1, b1, d1, -1
-	inner_left_f1  = a1, b1, D1, -1
-	outer_right_f1 = a1, b1, d1, +1
-	inner_right_f1 = a1, b1, D1, +1
-
-	outer_left_f2  = a2, b2, d2, -1
-	inner_left_f2  = a2, b2, D2, -1
-	outer_right_f2 = a2, b2, d2, +1
-	inner_right_f2 = a2, b2, D2, +1
-
-	if D1 > 0:
-		# two strip segments to check
-		# check if the strip segments of the first parabola overlap with them
-
-		if D2 > 0:
-			# two strip segments to check against two other strip segments
-			return (
-				root_intervals_overlap(outer_left_f1,  inner_left_f1,  outer_left_f2,  inner_left_f2)  or
-				root_intervals_overlap(outer_left_f1,  inner_left_f1,  inner_right_f2, outer_right_f2) or
-				root_intervals_overlap(inner_right_f1, outer_right_f1, outer_left_f2,  inner_left_f2)  or
-				root_intervals_overlap(inner_right_f1, outer_right_f1, inner_right_f2, outer_right_f2)
-			)
-
-		# two strip segments to check against one strip segment
-		return (
-			root_intervals_overlap(outer_left_f1,  inner_left_f1,  outer_left_f2, outer_right_f2) or
-			root_intervals_overlap(inner_right_f1, outer_right_f1, outer_left_f2, outer_right_f2)
-		)
-
-	# one strip segment to check
-	# check if the strip segments of the first parabola overlap with it
-
-	if D2 > 0:
-		# one strip segment to check against two strip segments
-		return (
-			root_intervals_overlap(outer_left_f1, outer_right_f1, outer_left_f2,  inner_left_f2) or
-			root_intervals_overlap(outer_left_f1, outer_right_f1, inner_right_f2, outer_right_f2)
-		)
-
-	# one strip segment to check against one strip segment
-	return root_intervals_overlap(outer_left_f1, outer_right_f1, outer_left_f2, outer_right_f2)
+	return False
 
 def dfs_in_discrete_curve(u, p0, p1, p2, visited):
 	if u in visited: return
