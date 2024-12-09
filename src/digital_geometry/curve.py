@@ -27,7 +27,7 @@ def point_before_endpoint(u, p0, u_in_P0, u_in_P1, u_in_P2):
 		or u.x < p0.x or (u.x == p0.x and u.y > p0.y)
 	)
 
-def point_in_discrete_curve(u, p0, p1, p2):
+def point_in_discrete_curve_1(u, p0, p1, p2):
 	p0 -= p1
 	p2 -= p1
 	u  -= p1
@@ -128,6 +128,17 @@ def clip_intervals(*intervals):
 	return clipped_intervals
 
 def get_strip_intervals(a, b, c):
+	if a == 0:
+		if b == 0:
+			if -1 <= c <= 1:
+				return [((1, 0, 0, 1), (1, 0, 4, 1))]
+			else:
+				return []
+
+		if b < 0: b, c = -b, -c
+
+		return clip_intervals(((b >> 1, c, 1, -1), (b >> 1, c, 1, +1)))
+
 	if a < 0: a, b, c = -a, -b, -c
 
 	d1 = b*b - 4*a*(c - 1)
@@ -161,7 +172,7 @@ def dfs_in_discrete_curve(u, p0, p1, p2, visited):
 	if u in visited: return
 	visited.add(u)
 
-	if not point_in_discrete_curve(u, p0, p1, p2):
+	if not point_in_discrete_curve_2(u, p0, p1, p2):
 		return
 
 	yield u
@@ -180,7 +191,7 @@ class Curve:
 		self.p2 = IntVec(p2)
 
 	def __contains__(self, point):
-		return point_in_discrete_curve(IntVec(point), self.p0, self.p1, self.p2)
+		return point_in_discrete_curve_2(IntVec(point), self.p0, self.p1, self.p2)
 
 	def __iter__(self):
 		yield from dfs_in_discrete_curve(self.p0, self.p0, self.p1, self.p2, set())
