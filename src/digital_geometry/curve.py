@@ -99,33 +99,13 @@ def sgn(x):
 def root_is_less_than(a1, b1, d1, s1, a2, b2, d2, s2):
 	s3 = sgn(s1*a2*a2*d1 - s2*a1*a1*d2)
 	s4 = sgn(a2*b1 - a1*b2)
-	s5 = -s1*s2*s3
-	s6 = sgn(s4*(a1*b2 - a2*b1)**2 - s3*(a2*a2*d1 + a1*a1*d2))
+	s5 = sgn(s4*(a1*b2 - a2*b1)**2 - s3*(a2*a2*d1 + a1*a1*d2))
 
-	return 4*s5*a1*a1*a2*a2*d1*d2 \
-		< s6*(s4*(a1*b2 - a2*b1)**2 - s3*(a2*a2*d1 + a1*a1*d2))**2
+	return -4*s1*s2*s3*a1*a1*a2*a2*d1*d2 \
+		< s5*(s4*(a1*b2 - a2*b1)**2 - s3*(a2*a2*d1 + a1*a1*d2))**2
 
 def root_intervals_overlap(start1, end1, start2, end2):
-	return not (root_is_less_than(*end2, *start1) or root_is_less_than(*end1, *start2))
-
-def root_below_zero(a, b, d, s):
-	return s*d < sgn(b)*b*b
-
-def root_above_one(a, b, d, s):
-	h = 2*a + b
-	return s*d > sgn(h)*h*h
-
-def clip_intervals(*intervals):
-	clipped_intervals = []
-
-	for start, end in intervals:
-		if root_below_zero(*end) or root_above_one(*start): continue
-		if root_below_zero(*start): start = 1, 0, 0, 1
-		if root_above_one(*end):    end   = 1, 0, 4, 1
-
-		clipped_intervals.append((start, end))
-
-	return clipped_intervals
+	return not (root_is_less_than(*end1, *start2) or root_is_less_than(*end2, *start1))
 
 def get_strip_intervals(a, b, c):
 	if a == 0:
@@ -137,7 +117,7 @@ def get_strip_intervals(a, b, c):
 
 		if b < 0: b, c = -b, -c
 
-		return clip_intervals(((b >> 1, c, 1, -1), (b >> 1, c, 1, +1)))
+		return [((b >> 1, c, 1, -1), (b >> 1, c, 1, +1))]
 
 	if a < 0: a, b, c = -a, -b, -c
 
@@ -149,20 +129,39 @@ def get_strip_intervals(a, b, c):
 	outer_left  = a, b, d1, -1
 	outer_right = a, b, d1, +1
 
-	if d2 <= 0: return clip_intervals((outer_left, outer_right))
+	if d2 <= 0: return [(outer_left, outer_right)]
 
 	inner_left  = a, b, d2, -1
 	inner_right = a, b, d2, +1
 
-	return clip_intervals((outer_left,  inner_left), (inner_right, outer_right))
+	return [(outer_left,  inner_left), (inner_right, outer_right)]
+
+def root_below_zero(a, b, d, s):
+	return s*d < sgn(b)*b*b
+
+def root_above_one(a, b, d, s):
+	h = 2*a + b
+	return s*d > sgn(h)*h*h
+
+def get_clipped_intervals(a, b, c):
+	clipped_intervals = []
+
+	for start, end in get_strip_intervals(a, b, c):
+		if root_below_zero(*end) or root_above_one(*start): continue
+		if root_below_zero(*start): start = 1, 0, 0, 1
+		if root_above_one(*end):    end   = 1, 0, 4, 1
+
+		clipped_intervals.append((start, end))
+
+	return clipped_intervals
 
 def point_in_discrete_curve_2(u, p0, p1, p2):
 	a1, a2 = 2*(p0 + p2 - 2*p1)
 	b1, b2 = 4*(p1 - p0)
 	c1, c2 = 2*(p0 - u)
 
-	for i1 in get_strip_intervals(a1, b1, c1):
-		for i2 in get_strip_intervals(a2, b2, c2):
+	for i1 in get_clipped_intervals(a1, b1, c1):
+		for i2 in get_clipped_intervals(a2, b2, c2):
 			if root_intervals_overlap(*i1, *i2):
 				return True
 
