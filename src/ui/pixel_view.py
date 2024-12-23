@@ -73,16 +73,25 @@ class PixelView:
 			print(f"ERROR!!!!!!: {e}")
 			pixels = []
 
-		for i, pixel in enumerate(pixels):
-			self.draw_pixel(pixel, pyray.Color(255, 0, 0, 255))
+		yellow = pyray.Color(255, 255, 0, 255)
+		red    = pyray.Color(255, 0, 0, 255)
 
-		self.draw_continous_curve(self.curve, pyray.Color(255, 255, 0, 255))
+		for i, pixel in enumerate(pixels):
+			self.draw_pixel(pixel, red)
+
+		self.draw_continous_curve(self.curve, yellow)
 
 		p0 = self.curve.p0 - self.curve.p1
 		p2 = self.curve.p2 - self.curve.p1
 
 		if p0.x * p2.y == p0.y * p2.x:
-			pyray.draw_text("The control points are collinear", 30, 30, 20, pyray.RED)
+			pyray.draw_text("The control points are collinear", 30, 30, 20, yellow)
+
+		if p0.x + p2.x == 0:
+			pyray.draw_text("The x-function is affine", 30, 50, 20, red)
+
+		if p0.y + p2.y == 0:
+			pyray.draw_text("The y-function is affine", 30, 70, 20, red)
 
 		for button in self.buttons:
 			button.draw()

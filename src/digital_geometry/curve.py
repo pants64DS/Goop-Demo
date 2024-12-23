@@ -110,21 +110,21 @@ def root_intervals_overlap(start1, end1, start2, end2):
 def get_strip_intervals(a, b, c):
 	if a == 0:
 		if b == 0:
-			if -1 <= c <= 1:
+			if c == 0:
 				return [((1, 0, 0, 1), (1, 0, 4, 1))]
 			else:
 				return []
 
 		if b < 0: b, c = -b, -c
 
-		return [((b >> 1, c, 1, -1), (b >> 1, c, 1, +1))]
+		return [((b, 2*c, 1, -1), (b, 2*c, 1, +1))]
 
 	if a < 0: a, b, c = -a, -b, -c
 
-	d1 = b*b - 4*a*(c - 1)
+	d1 = b*b - 2*a*(2*c - 1)
 	if d1 < 0: return []
 
-	d2 = b*b - 4*a*(c + 1)
+	d2 = b*b - 2*a*(2*c + 1)
 
 	outer_left  = a, b, d1, -1
 	outer_right = a, b, d1, +1
@@ -156,9 +156,9 @@ def get_clipped_intervals(a, b, c):
 	return clipped_intervals
 
 def point_in_discrete_curve_2(u, p0, p1, p2):
-	a1, a2 = 2*(p0 + p2 - 2*p1)
-	b1, b2 = 4*(p1 - p0)
-	c1, c2 = 2*(p0 - u)
+	a1, a2 = p0 + p2 - 2*p1
+	b1, b2 = 2*(p1 - p0)
+	c1, c2 = p0 - u
 
 	for i1 in get_clipped_intervals(a1, b1, c1):
 		for i2 in get_clipped_intervals(a2, b2, c2):
