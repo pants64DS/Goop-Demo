@@ -167,11 +167,47 @@ def point_in_discrete_curve_2(u, p0, p1, p2):
 
 	return False
 
+# ====================================================================================
+
+def point_in_discrete_curve_3(u, p0, p1, p2):
+	a = p0 + p2 - 2*p1
+	b = 2*(p1 - p0)
+	c = p0 - u
+
+	for i in 0, 1:
+		if a[i] < 0:
+			a[i], b[i], c[i] = -a[i], -b[i], -c[i]
+
+	for i in 0, 1:
+		j = 1 - i
+		a1, b1, c1 = a[i], b[i], c[i]
+		a2, b2, c2 = a[j], b[j], c[j]
+		for s1 in -1, 1:
+			d1 = b1*b1 - 2*a1*(2*c1 - s1)
+			if d1 < 0: continue
+
+			for s2 in -1, 1:
+				if root_below_zero(a1, b1, d1, s2) \
+				or root_above_one(a1, b1, d1, s2):
+					continue
+
+				A = a1*a1
+				B = -a1*(a1*(2*c2 + 1) + a2*(s1 - 2*c1) - b1*b2) - a2*b1*b1
+				D = d1*(a1*b2 - a2*b1)**2
+				s3 = s2*sgn(a1*b2 - a2*b1)
+
+				if  not root_below_zero(A, B, D, s3) \
+				and not root_above_one (A, B, D, s3):
+					return True
+	return False
+
+# ====================================================================================
+
 def dfs_in_discrete_curve(u, p0, p1, p2, visited):
 	if u in visited: return
 	visited.add(u)
 
-	if not point_in_discrete_curve_2(u, p0, p1, p2):
+	if not point_in_discrete_curve_3(u, p0, p1, p2):
 		return
 
 	yield u
@@ -190,7 +226,7 @@ class Curve:
 		self.p2 = IntVec(p2)
 
 	def __contains__(self, point):
-		return point_in_discrete_curve_2(IntVec(point), self.p0, self.p1, self.p2)
+		return point_in_discrete_curve_3(IntVec(point), self.p0, self.p1, self.p2)
 
 	def __iter__(self):
 		yield from dfs_in_discrete_curve(self.p0, self.p0, self.p1, self.p2, set())
