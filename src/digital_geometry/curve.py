@@ -170,34 +170,45 @@ def point_in_discrete_curve_2(u, p0, p1, p2):
 # ====================================================================================
 
 def point_in_discrete_curve_3(u, p0, p1, p2):
+	if p0 == p1 == p2: return u == p0
+
 	a = p0 + p2 - 2*p1
 	b = 2*(p1 - p0)
 	c = p0 - u
 
 	for i in 0, 1:
-		if a[i] < 0:
+		if a[i] < 0 or (a[i] == 0 and b[i] < 0):
 			a[i], b[i], c[i] = -a[i], -b[i], -c[i]
 
 	for i in 0, 1:
 		j = 1 - i
 		a1, b1, c1 = a[i], b[i], c[i]
 		a2, b2, c2 = a[j], b[j], c[j]
+
+		if a1 == 0:
+			for s1 in -1, 1:
+				d1 = s1 - 2*c1
+				if 0 <= d1 <= 2*b1 and \
+				   0 <= a2*d1**2 + 2*b1*(b1*(2*c2 + 1) + b2*d1) <= 4*b1*b1:
+						return True
+			continue
+
+		A = a1*a1
+		B0 = a1*(2*a2*c1 - a1*(2*c2 + 1) + b1*b2) - a2*b1*b1
+		s2 = sgn(a1*b2 - a2*b1)
+
 		for s1 in -1, 1:
 			d1 = b1*b1 - 2*a1*(2*c1 - s1)
 			if d1 < 0: continue
 
-			for s2 in -1, 1:
-				if root_below_zero(a1, b1, d1, s2) \
-				or root_above_one(a1, b1, d1, s2):
-					continue
+			B = B0 - a1*a2*s1
+			D = d1*(a1*b2 - a2*b1)**2
 
-				A = a1*a1
-				B = -a1*(a1*(2*c2 + 1) + a2*(s1 - 2*c1) - b1*b2) - a2*b1*b1
-				D = d1*(a1*b2 - a2*b1)**2
-				s3 = s2*sgn(a1*b2 - a2*b1)
-
-				if  not root_below_zero(A, B, D, s3) \
-				and not root_above_one (A, B, D, s3):
+			for s3 in -1, 1:
+				if  not root_below_zero(a1, b1, d1, s3) \
+				and not root_above_one (a1, b1, d1, s3) \
+				and not root_below_zero(A, B, D, s2*s3) \
+				and not root_above_one (A, B, D, s2*s3):
 					return True
 	return False
 
