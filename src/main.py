@@ -8,8 +8,9 @@ if __name__ == "__main__":
 	float_curve_view = ui.FloatCurveView()
 	float_loop_view = ui.FloatLoopView()
 	pixel_view = ui.PixelView()
+	curve_view = ui.CurveView()
 
-	curr_view = pixel_view
+	curr_view = curve_view
 	while not pyray.window_should_close():
 		if pyray.is_key_pressed(pyray.KEY_ONE):
 			curr_view = float_curve_view
@@ -22,6 +23,9 @@ if __name__ == "__main__":
 
 		if pyray.is_key_pressed(pyray.KEY_FOUR):
 			curr_view = pixel_view
+
+		if pyray.is_key_pressed(pyray.KEY_FIVE):
+			curr_view = curve_view
 
 		curr_view.update()
 		pyray.begin_drawing()

@@ -110,3 +110,9 @@ class FloatVec(Vector):
 
 def get_angle_between(u, v):
 	return math.atan2(u.x*v.y - v.x*u.y, u.x*v.x + u.y*v.y)
+
+def dot(u, v):
+	return u.x*v.x + u.y*v.y
+
+def det(u, v):
+	return u.x*v.y - v.x*u.y

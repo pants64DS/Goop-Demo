@@ -1,0 +1,1 @@
+from exact_geometry.curve_intersection import curve_intersection

@@ -10,6 +10,7 @@ packages = [{include = "goop_demo"}]
 python = "^3.8"
 raylib = "^4.2.1.2"
 numpy = "^1.24.1"
+sympy = "^1.13.3"
 
 
 [tool.poetry.group.dev.dependencies]
