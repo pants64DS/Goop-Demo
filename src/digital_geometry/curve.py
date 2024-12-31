@@ -189,8 +189,8 @@ def point_in_discrete_curve_3(u, p0, p1, p2):
 			for s1 in -1, 1:
 				d1 = s1 - 2*c1
 				if 0 <= d1 <= 2*b1 and \
-				   0 <= a2*d1**2 + 2*b1*(b1*(2*c2 + 1) + b2*d1) <= 4*b1*b1:
-						return True
+				   0 <= a2*d1*d1 + 2*b1*(b1*(2*c2 + 1) + b2*d1) <= 4*b1*b1:
+					return True
 			continue
 
 		A = a1*a1
