@@ -13,8 +13,8 @@ class CurveView:
 	def __init__(self):
 		self.buttons = ui.ButtonSystem(
 			ui.Button(ui.center_x -  60, ui.center_y + 180, pyray.RED),
-			ui.Button(ui.center_x - 350, ui.center_y - 200, pyray.GREEN),
-			ui.Button(ui.center_x + 350, ui.center_y + 100, pyray.YELLOW),
+			ui.Button(ui.center_x - 350, ui.center_y - 200, pyray.RED),
+			ui.Button(ui.center_x + 350, ui.center_y + 100, pyray.RED),
 			ui.Button(ui.center_x +  60, ui.center_y - 180, pyray.BLUE),
 			ui.Button(ui.center_x + 350, ui.center_y + 200, pyray.BLUE),
 			ui.Button(ui.center_x - 350, ui.center_y - 100, pyray.BLUE)
