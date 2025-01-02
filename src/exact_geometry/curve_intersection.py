@@ -69,10 +69,23 @@ def curve_intersection(p0, p1, p2, q0, q1, q2):
 		elif eval_implicit_parabola(p0, p1, p2, q2) >= 0:
 			# Both endpoints of the second curve are
 			# on the outer side of the first curve
-			return 5, None
+			if eval_implicit_parabola(q0, q1, q2, p0) < 0:
+				if eval_implicit_parabola(q0, q1, q2, p2) < 0:
+					# Both endpoints of the first curve are
+					# on the inner side of the second curve
+					return 5, count_curve_parabola_intersections(q0, q1, q2, p0, p1, p2) > 2
+			elif eval_implicit_parabola(q0, q1, q2, p2) >= 0:
+				# Both endpoints of the first curve are
+				# on the outer side of the second curve
+				return 6, (
+					count_curve_parabola_intersections(p0, p1, p2, q0, q1, q2) != 0 and
+					count_curve_parabola_intersections(q0, q1, q2, p0, p1, p2) != 0
+				)
+
+			return 7, True
 
 		# The endpoints of the second curve are
 		# on different sides of the first curve
-		return 6, None
+		return 8, None
 
 	return -1, None
