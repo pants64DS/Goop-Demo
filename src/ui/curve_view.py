@@ -9,6 +9,52 @@ res_strings = {
 	None:  "unimplemented"
 }
 
+def get_case_messages(case_id, result):
+	messages = []
+
+	if case_id in (1, 2):
+		messages.append("The blue curve doesn't intersect the line")
+
+		if case_id == 1:
+			messages.append("It's on a different of the line than the red curve")
+		else:
+			messages.append("It's on the same side of the line as the red curve")
+
+			if result:
+				messages.append("It intersects the extended red curve")
+			else:
+				messages.append("It doesn't intersect the extended red curve")
+
+		return messages
+
+	messages.append("The blue curve intersects the line")
+
+	if case_id == 3:
+		messages.append("Its endpoints are on the opposite side of the line as the red curve")
+
+		if result:
+			messages.append("The red curve intersects the extended blue curve")
+		else:
+			messages.append("The red curve doesn't intersect the extended blue curve")
+
+		return messages
+
+	if case_id in (4, 5, 6):
+		messages.append("Its endpoints are on the same side of the line as the red curve")
+
+		if case_id == 4:
+			messages.append("Its endpoints are between the line and red curve")
+
+			if result:
+				messages.append("The red curve intersects the extended blue curve more than twice")
+			else:
+				messages.append("The red curve intersects the extended blue curve twice or less")
+
+		if case_id == 5:
+			messages.append("Its endpoints are on the outer side of the red curve")
+
+	return messages
+
 class CurveView:
 	def __init__(self):
 		self.buttons = ui.ButtonSystem(
@@ -66,10 +112,16 @@ class CurveView:
 		self.case_id, self.result = curve_intersection(*positions)
 
 	def draw(self):
+		msg = f"Case {self.case_id}, {res_strings[self.result]}:"
+		pyray.draw_text(msg, 30, 30, 20, pyray.RED)
+
+		y = 60
+		for case_msg in get_case_messages(self.case_id, self.result):
+			pyray.draw_text(f"- {case_msg}.", 30, y, 20, pyray.GRAY)
+			y += 25
+
 		self.draw_curves()
 		self.draw_line(self.buttons[0].pos, self.buttons[2].pos)
-		msg = f"case {self.case_id}, {res_strings[self.result]}"
-		pyray.draw_text(msg, 30, 30, 20, pyray.RED)
 
 		for button in self.buttons:
 			button.draw()

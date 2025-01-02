@@ -18,6 +18,15 @@ def count_curve_parabola_intersections(p0, p1, p2, q0, q1, q2):
 	P = Poly((u[1]*x - u[0]*y)**2 + d*(2*(v[1]*x - v[0]*y) + d))
 	return count_roots(P, inf=0, sup=1)
 
+def eval_implicit_parabola(p0, p1, p2, x):
+	u = p0 + p2 - 2*p1
+	v = p0 - p2
+	d = det(p0 - p1, p2 - p1)
+	x -= p1
+
+	return (x[0]*u[1] - x[1]*u[0])**2 \
+		+ d*(2*(x[0]*v[1] - x[1]*v[0]) + d)
+
 def curve_intersection(p0, p1, p2, q0, q1, q2):
 	if det(p1 - p0, p2 - p0) < 0:
 		p0, p2 = p2, p0
@@ -41,9 +50,29 @@ def curve_intersection(p0, p1, p2, q0, q1, q2):
 		else:
 			return 2, count_curve_parabola_intersections(q0, q1, q2, p0, p1, p2) != 0
 
+	det_q0 = det(q0 - p0, g)
+	det_q2 = det(q2 - p0, g)
+
 	# If neither endpoint of the second curve is on
 	# the same side of the line as the first curve
-	if det(q0 - p0, g) <= 0 and det(q2 - p0, g) <= 0:
+	if det_q0 <= 0 and det_q2 <= 0:
 		return 3, count_curve_parabola_intersections(p0, p1, p2, q0, q1, q2) != 0
+
+	# If both endpoints of the second curve are on the
+	# same side of the line as the first curve
+	if det_q0 > 0 and det_q2 > 0:
+		if eval_implicit_parabola(p0, p1, p2, q0) < 0:
+			if eval_implicit_parabola(p0, p1, p2, q2) < 0:
+				# Both endpoints of the second curve are
+				# on the inner side of the first curve
+				return 4, count_curve_parabola_intersections(p0, p1, p2, q0, q1, q2) > 2
+		elif eval_implicit_parabola(p0, p1, p2, q2) >= 0:
+			# Both endpoints of the second curve are
+			# on the outer side of the first curve
+			return 5, None
+
+		# The endpoints of the second curve are
+		# on different sides of the first curve
+		return 6, None
 
 	return -1, None
