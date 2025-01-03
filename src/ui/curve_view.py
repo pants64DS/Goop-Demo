@@ -39,7 +39,7 @@ def get_case_messages(case_id, result):
 
 		return messages
 
-	if case_id in (4, 5, 6, 7, 8):
+	if case_id in (4, 5, 6, 7, 8, 9):
 		messages.append("Its endpoints are on the same side of the line as the red curve")
 
 		if case_id == 4:
@@ -50,7 +50,7 @@ def get_case_messages(case_id, result):
 			else:
 				messages.append("The red curve intersects the extended blue curve twice or less")
 
-		if case_id in (5, 6, 7):
+		elif case_id in (5, 6, 7):
 			messages.append("Its endpoints are on the outer side of the red curve")
 
 			if case_id == 5:
@@ -67,10 +67,22 @@ def get_case_messages(case_id, result):
 				if result:
 					messages.append("Both curves intersect the ohter curve extended")
 				else:
-					messages.append("A curve doesn't intersect the ohter curve extended")
+					messages.append("Neither curve intersects the ohter curve extended")
 
 			else:
 				messages.append("The endpoints of the red curve are on different sides of the blue curve")
+		else:
+			messages.append("Its endpoints are on different sides of the red curve")
+
+			if case_id == 8:
+				messages.append("The endpoints of the red curve are on different sides of the extended blue curve")
+
+				if result:
+					messages.append("Both curves intersect the other extended curve more than once")
+				else:
+					messages.append("One of the curves only intersects the other extended curve once")
+			else:
+				messages.append("The endpoints of the red curve are on the same side of the extended blue curve")
 
 	return messages
 

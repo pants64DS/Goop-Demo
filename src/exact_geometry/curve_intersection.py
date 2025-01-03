@@ -86,6 +86,14 @@ def curve_intersection(p0, p1, p2, q0, q1, q2):
 
 		# The endpoints of the second curve are
 		# on different sides of the first curve
-		return 8, None
+
+		if eval_implicit_parabola(q0, q1, q2, p0) \
+		 * eval_implicit_parabola(q0, q1, q2, p2) < 0:
+			return 8, (
+				count_curve_parabola_intersections(p0, p1, p2, q0, q1, q2) > 1 and
+				count_curve_parabola_intersections(q0, q1, q2, p0, p1, p2) > 1
+			)
+		else:
+			return 9, True
 
 	return -1, None
