@@ -182,33 +182,32 @@ def point_in_discrete_curve_3(u, p0, p1, p2):
 
 	for i in 0, 1:
 		j = 1 - i
-		a1, b1, c1 = a[i], b[i], c[i]
-		a2, b2, c2 = a[j], b[j], c[j]
+		ai, bi, ci = a[i], b[i], c[i]
+		aj, bj, cj = a[j], b[j], c[j]
 
-		if a1 == 0:
+		if ai == 0:
 			for s1 in -1, 1:
-				d1 = s1 - 2*c1
-				if 0 <= d1 <= 2*b1 and \
-				   0 <= a2*d1*d1 + 2*b1*(b1*(2*c2 + 1) + b2*d1) <= 4*b1*b1:
+				d1 = s1 - 2*ci
+				if 0 <= d1 <= 2*bi and \
+				   0 <= aj*d1*d1 + 2*bi*(bi*(2*cj + 1) + bj*d1) <= 4*bi*bi:
 					return True
 			continue
 
-		A = a1*a1
-		B0 = a1*(2*a2*c1 - a1*(2*c2 + 1) + b1*b2) - a2*b1*b1
-		s2 = sgn(a1*b2 - a2*b1)
-
 		for s1 in -1, 1:
-			d1 = b1*b1 - 2*a1*(2*c1 - s1)
+			d1 = bi*bi - 2*ai*(2*ci + s1)
 			if d1 < 0: continue
 
-			B = B0 - a1*a2*s1
-			D = d1*(a1*b2 - a2*b1)**2
+			A = ai*ai
+			B = ai*(bi*bj - ai*(2*cj + 1)) - aj*(d1 + ai*(2*ci + s1))
+
+			s2 = sgn(ai*bj - aj*bi)
+			d2 = d1*(ai*bj - aj*bi)**2
 
 			for s3 in -1, 1:
-				if  not root_below_zero(a1, b1, d1, s3) \
-				and not root_above_one (a1, b1, d1, s3) \
-				and not root_below_zero(A, B, D, s2*s3) \
-				and not root_above_one (A, B, D, s2*s3):
+				if  not root_below_zero(ai, bi, d1, s3) \
+				and not root_above_one (ai, bi, d1, s3) \
+				and not root_below_zero(A, B, d2, s2*s3) \
+				and not root_above_one (A, B, d2, s2*s3):
 					return True
 	return False
 
