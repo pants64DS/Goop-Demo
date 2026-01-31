@@ -1,6 +1,4 @@
-# Goop Demo
-
-A demo application that simulates a game mechanic involving opaque, paint-like liquid on a flat surface.
+A data structure and a demo application involving Boolean unions of quadratic Bézier polygons.
 
 ## Documentation
 * [Requirement Specification](doc/Requirement%20Specification.md)
